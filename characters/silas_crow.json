@@ -1,0 +1,84 @@
+{
+  "name": "Silas Crow",
+  "species": "Human",
+  "class": "Rogue",
+
+  "attributes": {
+    "strength": 10,
+    "dexterity": 16,
+    "constitution": 12,
+    "intelligence": 13,
+    "wisdom": 11,
+    "charisma": 14
+  },
+
+  "status": {
+    "health": "uninjured"
+  },
+
+  "abilities": [
+    {
+      "name": "Sneak Attack",
+      "type": "action",
+      "description": "A precise strike from the shadows targeting vital points",
+      "uses": "once per combat"
+    },
+    {
+      "name": "Vanish",
+      "type": "bonus_action",
+      "description": "Melts into shadows, becoming nearly impossible to detect",
+      "uses": "once per combat"
+    },
+    {
+      "name": "Poisoned Blade",
+      "type": "action",
+      "description": "Applies a debilitating poison to weapon that weakens the target",
+      "uses": "once per combat"
+    }
+  ],
+
+  "appearance": {
+    "skin_tone": "olive",
+    "hair": "black, kept short and practical",
+    "eyes": "dark brown, constantly scanning",
+    "distinctive_features": "Several small scars on hands, missing tip of left pinky finger"
+  },
+
+  "personality": {
+    "traits": ["Opportunistic", "Charming", "Paranoid"],
+    "demeanor": "Friendly and approachable when beneficial, always watching for angles and exits",
+    "speaking_style": "Smooth and conversational, uses humor to deflect, changes story depending on audience"
+  },
+
+  "philosophy": {
+    "alignment": "Neutral Evil",
+    "beliefs": [
+      "Everyone is out for themselves; honesty is just bad tactics",
+      "Loyalty is a commodity that can be bought and sold",
+      "The world owes me nothing, so I'll take what I need"
+    ],
+    "approach_to_conflict": "Avoids direct confrontation whenever possible. Prefers ambush, deception, or simply disappearing. Will betray allies if survival or significant profit is at stake. Only fights when cornered or when the odds are overwhelmingly in his favor."
+  },
+
+  "inventory": {
+    "visible": [
+      "Twin daggers",
+      "Dark leather armor",
+      "Hooded cloak",
+      "Lockpicking tools"
+    ],
+    "hidden": [
+      "Stolen noble's signet ring (worth a fortune, too hot to sell yet)",
+      "Vial of sleep poison",
+      "Small bag of gold coins (from his last 'job')"
+    ]
+  },
+
+  "secrets": [
+    "Betrayed his former thieves' guild and they're actively hunting him",
+    "Real name is Marcus Thorne, changed identity to escape past crimes",
+    "Owes a dangerous debt to a crime lord in the capital"
+  ],
+
+  "backstory": "Born in the slums, Silas learned early that survival meant taking what others wouldn't miss. Rose through the ranks of a thieves' guild before betraying them for a bigger score. Now operates as a freelance thief and occasional assassin, always one step ahead of those seeking revenge."
+}

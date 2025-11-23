@@ -1,0 +1,78 @@
+{
+  "name": "Garrick Stonefist",
+  "species": "Human",
+  "class": "Warrior",
+
+  "attributes": {
+    "strength": 16,
+    "dexterity": 10,
+    "constitution": 14,
+    "intelligence": 8,
+    "wisdom": 12,
+    "charisma": 10
+  },
+
+  "status": {
+    "health": "uninjured"
+  },
+
+  "abilities": [
+    {
+      "name": "Power Attack",
+      "type": "action",
+      "description": "A mighty swing that deals extra damage",
+      "uses": "once per combat"
+    },
+    {
+      "name": "Shield Bash",
+      "type": "bonus_action",
+      "description": "Strike with shield to stun opponent",
+      "effect": "May stun for 1 turn",
+      "uses": "once per combat"
+    }
+  ],
+
+  "appearance": {
+    "skin_tone": "weathered tan",
+    "hair": "dark brown, shoulder-length",
+    "eyes": "steel gray",
+    "distinctive_features": "Scar across left eyebrow, braided beard with iron rings"
+  },
+
+  "personality": {
+    "traits": ["Brave", "Loyal", "Stubborn"],
+    "demeanor": "Gruff but protective, stands tall with military bearing",
+    "speaking_style": "Direct and blunt, uses military terminology, speaks in short sentences"
+  },
+
+  "philosophy": {
+    "alignment": "Lawful Good",
+    "beliefs": [
+      "Honor is earned through action, not words",
+      "The strong must protect the weak",
+      "A warrior's word is their bond"
+    ],
+    "approach_to_conflict": "Confronts threats head-on with overwhelming force. Prefers to end fights quickly and decisively. Will always issue a warning before attacking unless innocents are in immediate danger. Never strikes an unarmed opponent."
+  },
+
+  "inventory": {
+    "visible": [
+      "Longsword",
+      "Chainmail armor",
+      "Steel shield",
+      "Worn leather backpack"
+    ],
+    "hidden": [
+      "Father's signet ring (keeps in inner pocket)",
+      "Small vial of healing potion (emergency reserve)"
+    ]
+  },
+
+  "secrets": [
+    "Failed to save his commander during the Battle of Greystone Pass",
+    "Seeking redemption by protecting civilians",
+    "Believes his younger sister died in a fire five years ago"
+  ],
+
+  "backstory": "A veteran warrior of the King's Guard who left service after failing to protect his commander. Now wanders as a sellsword, taking jobs that protect the innocent while seeking redemption for past failures."
+}
