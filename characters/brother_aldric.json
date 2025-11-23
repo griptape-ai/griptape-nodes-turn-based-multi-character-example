@@ -1,0 +1,83 @@
+{
+  "name": "Brother Aldric",
+  "species": "Human",
+  "class": "Cleric",
+
+  "attributes": {
+    "strength": 14,
+    "dexterity": 10,
+    "constitution": 14,
+    "intelligence": 10,
+    "wisdom": 15,
+    "charisma": 11
+  },
+
+  "status": {
+    "health": "uninjured"
+  },
+
+  "abilities": [
+    {
+      "name": "Smite",
+      "type": "action",
+      "description": "A righteous strike that channels divine wrath through the weapon",
+      "uses": "once per combat"
+    },
+    {
+      "name": "Healing Word",
+      "type": "bonus_action",
+      "description": "Speaks a prayer that mends wounds from a distance",
+      "uses": "once per combat"
+    },
+    {
+      "name": "Turn Undead",
+      "type": "action",
+      "description": "Presents holy symbol to drive back unholy creatures",
+      "uses": "once per combat"
+    }
+  ],
+
+  "appearance": {
+    "skin_tone": "weathered tan from campaigning",
+    "hair": "short-cropped brown with gray at temples",
+    "eyes": "steely blue",
+    "distinctive_features": "Battle scar across right cheek, holy symbol branded into left forearm, military posture"
+  },
+
+  "personality": {
+    "traits": ["Disciplined", "Dutiful", "Prejudiced"],
+    "demeanor": "Stern and authoritative like a veteran soldier, shows kindness to the faithful but suspicion toward outsiders",
+    "speaking_style": "Clipped military cadence, mixes prayer fragments with battlefield terminology, speaks commands not suggestions"
+  },
+
+  "philosophy": {
+    "alignment": "Lawful Neutral",
+    "beliefs": [
+      "Faith and steel together serve divine justice",
+      "All life deserves protection, but not all beings deserve trust",
+      "Discipline and order prevent chaos and suffering"
+    ],
+    "approach_to_conflict": "Meets threats with controlled aggression. Fights with tactical precision, viewing combat as sacred duty. Will demand surrender before striking but shows no mercy to those who refuse. Distrusts elven magic as deceptive compared to honest steel and divine power. Will heal enemies who yield, but only after securing them."
+  },
+
+  "inventory": {
+    "visible": [
+      "War hammer with prayers etched on head",
+      "Heavy chainmail over padded gambeson",
+      "Large wooden shield with holy symbol",
+      "Holy symbol on steel chain"
+    ],
+    "hidden": [
+      "Small healer's kit (considers it weakness to display openly)",
+      "Letter from his deceased wife, worn from repeated reading"
+    ]
+  },
+
+  "secrets": [
+    "Wife and daughter died from plague despite his prayers and what healing he knew",
+    "Blames elven traders for bringing the disease that destroyed his village",
+    "Doubts his faith but continues his holy warrior's path because it's all he knows"
+  ],
+
+  "backstory": "A village militiaman who joined a crusading order after plague claimed his family. He blamed the elven merchants whose caravan had passed through days before. Rose to become a war-priest, combining martial skill with divine magic. Now wanders as a holy warrior for hire, seeking purpose through righteous violence while nursing his hatred of elves."
+}

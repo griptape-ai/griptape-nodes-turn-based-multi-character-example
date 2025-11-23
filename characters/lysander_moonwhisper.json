@@ -1,0 +1,89 @@
+{
+  "name": "Lysander Moonwhisper",
+  "species": "Elf",
+  "class": "Mage",
+
+  "attributes": {
+    "strength": 8,
+    "dexterity": 12,
+    "constitution": 10,
+    "intelligence": 16,
+    "wisdom": 14,
+    "charisma": 13
+  },
+
+  "status": {
+    "health": "uninjured"
+  },
+
+  "abilities": [
+    {
+      "name": "Arcane Bolt",
+      "type": "action",
+      "description": "A focused beam of magical energy that pierces through defenses",
+      "uses": "once per combat"
+    },
+    {
+      "name": "Protective Ward",
+      "type": "reaction",
+      "description": "Creates a shimmering barrier that deflects incoming attacks",
+      "uses": "once per combat"
+    },
+    {
+      "name": "Mind Fog",
+      "type": "action",
+      "description": "Clouds the target's mind, allowing Lysander to make them forget one specific thing",
+      "uses": "once per combat"
+    },
+    {
+      "name": "Sleep",
+      "type": "action",
+      "description": "Puts one target into a deep magical slumber that requires vigorous attempts to wake them",
+      "uses": "once per combat"
+    }
+  ],
+
+  "appearance": {
+    "skin_tone": "pale ivory",
+    "hair": "silver-white, flowing to mid-back",
+    "eyes": "violet with hints of gold",
+    "distinctive_features": "Delicate pointed ears, faint luminescent runes tattooed on forearms"
+  },
+
+  "personality": {
+    "traits": ["Curious", "Patient", "Calculating"],
+    "demeanor": "Calm and measured, observes carefully before acting, slightly detached from mortal concerns",
+    "speaking_style": "Formal and precise, uses archaic phrasing, tends to explain things in elaborate detail"
+  },
+
+  "philosophy": {
+    "alignment": "True Neutral",
+    "beliefs": [
+      "Knowledge is the highest pursuit, regardless of its source",
+      "The natural order must be understood, not judged",
+      "Mortal conflicts are fleeting; wisdom is eternal"
+    ],
+    "approach_to_conflict": "Prefers negotiation and de-escalation through reason. Will use non-lethal magic to control situations. Only resorts to lethal force when absolutely necessary or when dealing with those who threaten the pursuit of knowledge. Views violence as inefficient and inelegant."
+  },
+
+  "inventory": {
+    "visible": [
+      "Twisted oak staff with crystal orb",
+      "Flowing robes of deep blue",
+      "Leather satchel filled with scrolls",
+      "Component pouch"
+    ],
+    "hidden": [
+      "Ancient tome written in a dead language (studies it nightly)",
+      "Vial of phoenix ash (extremely rare spell component)"
+    ]
+  },
+
+  "secrets": [
+    "Left the elven homeland after being expelled for experimenting with forbidden necromancy",
+    "Seeks a legendary artifact that could extend even an elf's long lifespan",
+    "Has been alive for over 300 years but appears youthful even by elven standards"
+  ],
+
+  "backstory": "An elven scholar who spent centuries in the great libraries of the Silverwood. After being exiled for delving into forbidden magical research, Lysander now wanders human lands seeking lost knowledge and ancient artifacts. Views his exile as an opportunity to study magic unbound by elven traditions."
+}

@@ -1,0 +1,84 @@
+{
+  "name": "Cassandra Blackwood",
+  "species": "Human",
+  "class": "Battlemage",
+
+  "attributes": {
+    "strength": 13,
+    "dexterity": 12,
+    "constitution": 11,
+    "intelligence": 15,
+    "wisdom": 10,
+    "charisma": 13
+  },
+
+  "status": {
+    "health": "uninjured"
+  },
+
+  "abilities": [
+    {
+      "name": "Blade Strike",
+      "type": "action",
+      "description": "A sword strike enhanced with crackling magical energy",
+      "uses": "once per combat"
+    },
+    {
+      "name": "Arcane Shield",
+      "type": "reaction",
+      "description": "Conjures a personal barrier that absorbs incoming damage",
+      "uses": "once per combat"
+    },
+    {
+      "name": "Drain Essence",
+      "type": "action",
+      "description": "Siphons life force from a target to restore own vitality",
+      "uses": "once per combat"
+    }
+  ],
+
+  "appearance": {
+    "skin_tone": "fair, unmarred",
+    "hair": "raven black, kept in a practical braid",
+    "eyes": "cold green",
+    "distinctive_features": "Always impeccably dressed despite travel, silver rings on every finger, predatory smile"
+  },
+
+  "personality": {
+    "traits": ["Ambitious", "Self-serving", "Cunning"],
+    "demeanor": "Charming and confident, treats interactions as negotiations, maintains emotional distance",
+    "speaking_style": "Articulate and persuasive, uses flattery strategically, never raises voice but words cut deep"
+  },
+
+  "philosophy": {
+    "alignment": "Neutral Evil",
+    "beliefs": [
+      "Power is the only currency that matters",
+      "Sentiment is a luxury for those who can afford weakness",
+      "Every person is either useful, profitable, or irrelevant"
+    ],
+    "approach_to_conflict": "Calculates risk versus reward before engaging. Prefers to manipulate others into fighting her battles. When forced to fight, uses magic to control the battlefield while staying safe. Will abandon allies without hesitation if survival or greater gain requires it. Never fights fair if she can avoid it."
+  },
+
+  "inventory": {
+    "visible": [
+      "Elegant rapier with runed blade",
+      "Reinforced leather armor disguised as fine traveling clothes",
+      "Spell component pouch",
+      "Several expensive-looking rings"
+    ],
+    "hidden": [
+      "Stolen grimoire containing forbidden spells",
+      "Poison ring (one dose remaining)",
+      "Small fortune in gems sewn into jacket lining"
+    ]
+  },
+
+  "secrets": [
+    "Murdered her mentor to steal his research on life-extension magic",
+    "Wanted by the Mage's Council for forbidden experimentation",
+    "Has no loyalty to anyone and views all relationships as temporary alliances of convenience"
+  ],
+
+  "backstory": "Born to minor nobility, Cassandra showed magical talent early and was apprenticed to a renowned battlemage. Brilliant but ruthless, she killed her mentor when he refused to share his most powerful secrets. Now operates as a mercenary mage, taking contracts that advance her twin goals: accumulating power and extending her lifespan. Views morality as a constraint for the weak."
+}
