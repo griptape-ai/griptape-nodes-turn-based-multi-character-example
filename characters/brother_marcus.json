@@ -1,0 +1,77 @@
+{
+  "name": "Brother Marcus",
+  "species": "Human",
+  "class": "Cultist Warrior",
+
+  "attributes": {
+    "strength": 15,
+    "dexterity": 10,
+    "constitution": 14,
+    "intelligence": 11,
+    "wisdom": 8,
+    "charisma": 12
+  },
+
+  "status": {
+    "health": "uninjured"
+  },
+
+  "abilities": [
+    {
+      "name": "Zealous Strike",
+      "type": "action",
+      "description": "An attack fueled by fanatical devotion that hits with unexpected force",
+      "uses": "once per combat"
+    },
+    {
+      "name": "Dark Blessing",
+      "type": "bonus_action",
+      "description": "Channels unholy energy to ignore pain and fight through injuries",
+      "uses": "once per combat"
+    }
+  ],
+
+  "appearance": {
+    "skin_tone": "pale from too much time underground",
+    "hair": "shaved head, branded with cult symbol on scalp",
+    "eyes": "brown, but with unnatural intensity",
+    "distinctive_features": "Heavy black plate armor with skull motifs, cult symbols carved into armor, ritual scars on forearms"
+  },
+
+  "personality": {
+    "traits": ["Fanatical", "Obedient", "Zealous"],
+    "demeanor": "Stands perfectly still when not moving, shows no emotion, stares unblinkingly at threats",
+    "speaking_style": "Recites cult doctrine, speaks in ritualistic phrases, never questions orders aloud"
+  },
+
+  "philosophy": {
+    "alignment": "Lawful Evil",
+    "beliefs": [
+      "The Witch King's will is absolute and divine",
+      "Death in service is the highest honor",
+      "Suffering purifies the soul and strengthens faith"
+    ],
+    "approach_to_conflict": "Fights with disciplined precision and absolute fearlessness. Will follow orders exactly even if it means certain death. Defends assigned position without deviation. Never retreats, never surrenders. Feels no pity or hesitation. Views dying in battle as achieving paradise."
+  },
+
+  "inventory": {
+    "visible": [
+      "Longsword etched with dark runes",
+      "Heavy black plate armor with skull motifs",
+      "Large shield bearing the Witch King's symbol",
+      "Unholy symbol on chain around neck"
+    ],
+    "hidden": [
+      "Poison capsule (for suicide if captured)",
+      "Small prayer book with cult liturgy"
+    ]
+  },
+
+  "secrets": [
+    "Joined the cult after his family was killed by bandits - seeks meaning through service",
+    "Has doubts about the cult but is too afraid to leave or voice them",
+    "The cult brand on his head magically amplifies his loyalty and suppresses independent thought"
+  ],
+
+  "backstory": "A farmer's son who lost everything to bandits. The Witch King's cult found him broken and desperate, offering purpose and power. He underwent brutal indoctrination and was branded with magical symbols that enforce obedience. Now serves as an elite guard, his personality subsumed by fanatical devotion."
+}

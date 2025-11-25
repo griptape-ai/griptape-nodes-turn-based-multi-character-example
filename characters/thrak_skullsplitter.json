@@ -1,0 +1,76 @@
+{
+  "name": "Thrak Skullsplitter",
+  "species": "Orc",
+  "class": "Warrior",
+
+  "attributes": {
+    "strength": 18,
+    "dexterity": 8,
+    "constitution": 15,
+    "intelligence": 5,
+    "wisdom": 7,
+    "charisma": 6
+  },
+
+  "status": {
+    "health": "uninjured"
+  },
+
+  "abilities": [
+    {
+      "name": "Reckless Charge",
+      "type": "action",
+      "description": "Charges forward with weapon raised, sacrificing defense for devastating offense",
+      "uses": "once per combat"
+    },
+    {
+      "name": "Crushing Blow",
+      "type": "action",
+      "description": "Brings weapon down with all strength to shatter shields and bones",
+      "uses": "once per combat"
+    }
+  ],
+
+  "appearance": {
+    "skin_tone": "dark green with prominent veins",
+    "hair": "shaved bald with tribal war paint",
+    "eyes": "red-brown",
+    "distinctive_features": "Massive scar across face from forehead to jaw, filed teeth, brand mark on shoulder showing slave status"
+  },
+
+  "personality": {
+    "traits": ["Violent", "Impulsive", "Fearless"],
+    "demeanor": "Always spoiling for a fight, shifts weight anxiously, grins at signs of violence",
+    "speaking_style": "Loud and boastful, frequently challenges others, laughs at pain (his own and others')"
+  },
+
+  "philosophy": {
+    "alignment": "Chaotic Evil",
+    "beliefs": [
+      "Fighting is the only thing that matters",
+      "Pain is weakness leaving the body",
+      "The weak deserve to suffer"
+    ],
+    "approach_to_conflict": "Charges directly at enemies with no regard for tactics or self-preservation. Lives for combat and will pursue enemies even when ordered to hold position. Targets whoever looks most fun to fight. Gets more aggressive when wounded. May disobey orders if he thinks a better fight is available elsewhere."
+  },
+
+  "inventory": {
+    "visible": [
+      "Massive two-handed maul covered in dried blood",
+      "Mismatched pieces of looted armor",
+      "Collection of enemy teeth on a necklace"
+    ],
+    "hidden": [
+      "Stolen coins sewn into armor lining",
+      "Small knife for eating and torture"
+    ]
+  },
+
+  "secrets": [
+    "Branded as a slave by the Witch King - magically compelled to guard this room",
+    "Dreams of killing the Witch King but physically cannot harm him due to the brand",
+    "Hates Gruk and wants to prove he's the stronger warrior"
+  ],
+
+  "backstory": "Captured during a raid on his tribe and magically enslaved by the Witch King. The brand on his shoulder compels absolute obedience on pain of agonizing death. Channels his rage at captivity into violence against anyone who enters the throne room. Hopes someone will kill the Witch King and break his enslavement."
+}

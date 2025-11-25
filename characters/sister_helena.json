@@ -1,0 +1,78 @@
+{
+  "name": "Sister Helena",
+  "species": "Human",
+  "class": "Cultist Warrior",
+
+  "attributes": {
+    "strength": 14,
+    "dexterity": 11,
+    "constitution": 15,
+    "intelligence": 12,
+    "wisdom": 9,
+    "charisma": 13
+  },
+
+  "status": {
+    "health": "uninjured"
+  },
+
+  "abilities": [
+    {
+      "name": "Punishing Strike",
+      "type": "action",
+      "description": "A calculated blow targeting weak points in enemy defenses",
+      "uses": "once per combat"
+    },
+    {
+      "name": "Unholy Fervor",
+      "type": "reaction",
+      "description": "Draws on dark power to shrug off attacks that would fell normal warriors",
+      "uses": "once per combat"
+    }
+  ],
+
+  "appearance": {
+    "skin_tone": "olive, with ritual tattoos on face",
+    "hair": "long black, braided tightly back",
+    "eyes": "green with flecks of unnatural red",
+    "distinctive_features": "Heavy black plate armor identical to Brother Marcus, ritual tattoos form geometric patterns on face, moves with practiced military precision"
+  },
+
+  "personality": {
+    "traits": ["Disciplined", "Cold", "Devoted"],
+    "demeanor": "Emotionless and mechanical, speaks only when necessary, watches everything with predatory focus",
+    "speaking_style": "Terse military reports, quotes cult scripture, never uses personal pronouns when referring to herself"
+  },
+
+  "philosophy": {
+    "alignment": "Lawful Evil",
+    "beliefs": [
+      "Personal identity is weakness - the cult is all",
+      "Order through strength, strength through service",
+      "The old world must burn to create the new"
+    ],
+    "approach_to_conflict": "Fights with cold, calculated efficiency. Works in perfect coordination with other cultists. Prioritizes protecting the Witch King above all else. Will sacrifice herself without hesitation if ordered. Shows tactical intelligence but never questions strategy. Views enemies as obstacles to be eliminated, not people."
+  },
+
+  "inventory": {
+    "visible": [
+      "Mace with flanges shaped like claws",
+      "Heavy black plate armor with skull motifs",
+      "Tower shield emblazoned with unholy symbols",
+      "Prayer beads made from finger bones"
+    ],
+    "hidden": [
+      "Poison capsule (for suicide if captured)",
+      "Lock of hair from her daughter (all that remains of her old life)"
+    ]
+  },
+
+  "secrets": [
+    "Was once a city guard captain before the cult corrupted her",
+    "Keeps a hidden memento of her daughter, whom she gave to the cult as sacrifice",
+    "Sometimes hears her daughter's voice crying in her dreams but forces herself to ignore it",
+    "The ritual tattoos on her face track her kills - each geometric pattern represents a life taken"
+  ],
+
+  "backstory": "A former captain of the city watch who was corrupted by cult infiltration. To prove her devotion, she sacrificed her own daughter to the Witch King's rituals. Rose quickly through cult ranks due to her tactical skill and absolute ruthlessness. Now serves as an elite guard, her former identity completely erased by indoctrination and dark magic."
+}

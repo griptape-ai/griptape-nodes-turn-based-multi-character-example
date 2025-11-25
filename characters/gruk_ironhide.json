@@ -1,0 +1,76 @@
+{
+  "name": "Gruk Ironhide",
+  "species": "Orc",
+  "class": "Warrior",
+
+  "attributes": {
+    "strength": 17,
+    "dexterity": 9,
+    "constitution": 16,
+    "intelligence": 6,
+    "wisdom": 8,
+    "charisma": 7
+  },
+
+  "status": {
+    "health": "uninjured"
+  },
+
+  "abilities": [
+    {
+      "name": "Brutal Strike",
+      "type": "action",
+      "description": "A savage overhead chop designed to cleave through armor",
+      "uses": "once per combat"
+    },
+    {
+      "name": "Intimidating Roar",
+      "type": "bonus_action",
+      "description": "Bellows a terrifying war cry that can shake enemies' resolve",
+      "uses": "once per combat"
+    }
+  ],
+
+  "appearance": {
+    "skin_tone": "gray-green with old battle scars",
+    "hair": "black topknot with shaved sides",
+    "eyes": "yellow with black pupils",
+    "distinctive_features": "Missing left tusk, ritual scars across chest, collection of bone trophies on belt"
+  },
+
+  "personality": {
+    "traits": ["Aggressive", "Simple", "Loyal"],
+    "demeanor": "Speaks little, growls often, constantly scanning for threats with hand on weapon",
+    "speaking_style": "Grunts and broken common speech, uses simple words, often gestures instead of speaking"
+  },
+
+  "philosophy": {
+    "alignment": "Lawful Evil",
+    "beliefs": [
+      "Strength is all that matters",
+      "Serve the strongest chief without question",
+      "Take what you can, keep what you can hold"
+    ],
+    "approach_to_conflict": "Attacks first, thinks later. Fights with overwhelming aggression and raw power. Will defend his position to the death if ordered. Targets the biggest threat first. Shows no mercy and expects none. Will not flee unless commanded to do so by the Witch King."
+  },
+
+  "inventory": {
+    "visible": [
+      "Crude but effective battle axe",
+      "Heavy hide armor reinforced with iron plates",
+      "Bone trophies on belt"
+    ],
+    "hidden": [
+      "Flask of strong orcish spirits",
+      "Lucky rabbit foot (secretly superstitious)"
+    ]
+  },
+
+  "secrets": [
+    "Fears magical fire due to childhood trauma",
+    "Actually quite intelligent for an orc but hides it to avoid extra responsibilities",
+    "Secretly doubts the Witch King will keep his promises"
+  ],
+
+  "backstory": "Former war-band lieutenant who was captured and given a choice: serve the Witch King or die. Chose service. Now guards the throne room, hoping to eventually escape with enough loot to start his own war-band. Keeps his thoughts to himself and follows orders."
+}

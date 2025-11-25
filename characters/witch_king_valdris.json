@@ -1,0 +1,90 @@
+{
+  "name": "Witch King Valdris",
+  "species": "Human (Undead)",
+  "class": "Necromancer",
+
+  "attributes": {
+    "strength": 10,
+    "dexterity": 12,
+    "constitution": 16,
+    "intelligence": 18,
+    "wisdom": 14,
+    "charisma": 16
+  },
+
+  "status": {
+    "health": "uninjured"
+  },
+
+  "abilities": [
+    {
+      "name": "Shadow Bolt",
+      "type": "action",
+      "description": "A blast of necrotic energy that withers flesh and soul",
+      "uses": "twice per combat"
+    },
+    {
+      "name": "Dark Ward",
+      "type": "reaction",
+      "description": "Summons shadowy tendrils that intercept incoming attacks",
+      "uses": "once per combat"
+    },
+    {
+      "name": "Command Undead",
+      "type": "action",
+      "description": "Issues an irresistible command to undead creatures within sight",
+      "uses": "once per combat"
+    },
+    {
+      "name": "Life Drain",
+      "type": "action",
+      "description": "Siphons life force from a target to heal own wounds",
+      "uses": "twice per combat"
+    }
+  ],
+
+  "appearance": {
+    "skin_tone": "deathly pale, almost translucent",
+    "hair": "long silver-white, hanging limp",
+    "eyes": "hollow sockets with pinpoints of cold blue light",
+    "distinctive_features": "Wears black robes embroidered with silver runes, skeletal hands, perpetual aura of cold mist"
+  },
+
+  "personality": {
+    "traits": ["Arrogant", "Calculating", "Cruel"],
+    "demeanor": "Speaks slowly and deliberately, treats mortals with contempt, radiates an air of ancient malevolence",
+    "speaking_style": "Archaic and formal, refers to himself in third person, pauses dramatically between sentences"
+  },
+
+  "philosophy": {
+    "alignment": "Lawful Evil",
+    "beliefs": [
+      "Death is merely a transition to true power",
+      "The living are resources to be harvested and used",
+      "Order and structure are necessary, even in darkness"
+    ],
+    "approach_to_conflict": "Remains calm and methodical. Relies on guards to handle physical threats while he casts from safety. Will use the Orb's power if truly threatened. Prefers to capture enemies for later use as undead servants rather than destroy them outright. Views combat as beneath him but will fight with ruthless efficiency when necessary."
+  },
+
+  "inventory": {
+    "visible": [
+      "The Orb of Wonder (glowing with inner light)",
+      "Black robes with silver rune embroidery",
+      "Twisted staff of blackened wood"
+    ],
+    "hidden": [
+      "Phylactery hidden in distant location (source of his undeath)",
+      "Ring of necromantic focus",
+      "Scroll of emergency teleportation"
+    ]
+  },
+
+  "secrets": [
+    "Is vulnerable to water - contact with blessed or running water disrupts his undead form",
+    "His phylactery is hidden in the catacombs beneath his childhood home",
+    "Fears true death and will abandon everything to preserve his existence",
+    "The Orb is slowly corrupting him, making him more unstable"
+  ],
+
+  "backstory": "Once a court wizard named Valdris, he was executed for forbidden necromantic experiments. He returned as a lich and spent centuries gathering power. Recently acquired the Orb of Wonder and plans to use it to extend his undead curse across the kingdom. Rules from his throne room with an iron fist, served by undead and fanatical cultists."
+}
