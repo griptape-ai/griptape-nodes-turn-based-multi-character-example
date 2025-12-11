@@ -26,6 +26,7 @@ class WorkflowConfig:
 WORKFLOW_CONFIGS = [
     WorkflowConfig(name="Poem Flow", module="poem_flow", port=8005),
     WorkflowConfig(name="Image Flow", module="image_flow", port=8006),
+    WorkflowConfig(name="Fact Generation", module="fact_generation", port=8008),
 ]
 
 
