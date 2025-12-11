@@ -67,6 +67,19 @@ def _initialize_run_scenario_state() -> None:
         st.session_state.current_turn = 0
     if "processing_turn" not in st.session_state:
         st.session_state.processing_turn = False
+    # Initialize expander states (default to expanded)
+    if "expander_setting" not in st.session_state:
+        st.session_state.expander_setting = True
+    if "expander_location" not in st.session_state:
+        st.session_state.expander_location = True
+    if "expander_scenario" not in st.session_state:
+        st.session_state.expander_scenario = True
+    if "expander_scene" not in st.session_state:
+        st.session_state.expander_scene = True
+    if "expander_characters" not in st.session_state:
+        st.session_state.expander_characters = True
+    if "expander_facts_editor" not in st.session_state:
+        st.session_state.expander_facts_editor = True
 
 
 def _check_dirty_state() -> bool:
@@ -223,7 +236,7 @@ def _render_character_list_readonly() -> None:
         st.info("No characters available. Go to the Characters tab to add characters.")
         return
     
-    st.subheader("Character List")
+    # Character List subheader removed - now handled by expander
     
     for char in characters:
         char_id = char.get("_id", "")
@@ -348,125 +361,116 @@ def render() -> None:
         with st.container():
             st.subheader("Configuration")
             
-            # Setting Display (Read-Only)
-            st.markdown("**Setting**")
-            context = st.session_state.get("context_text_area", "")
-            tone = st.session_state.get("tone_text_area", "")
-            
-            if context:
-                st.text_area("Context:", value=context, height=80, disabled=True, key="context_display_readonly")
-            else:
-                st.info("No context configured.")
-            
-            if tone:
-                st.text_area("Tone & Direction:", value=tone, height=80, disabled=True, key="tone_display_readonly")
-            else:
-                st.info("No tone configured.")
-            
-            st.divider()
-            
-            # Location Display (Read-Only)
-            st.markdown("**Location**")
-            location = st.session_state.get("location_text", "")
-            if location:
-                st.text_area("Location:", value=location, height=100, disabled=True, key="location_display_readonly")
-            else:
-                st.info("No location configured.")
-            
-            st.divider()
-            
-            # Scenario Configuration
-            st.markdown("**Scenario**")
-            scenario_options = list(SCENARIO_PREFABS.keys())
-            selected_scenario = st.selectbox(
-                "Scenario",
-                options=scenario_options,
-                index=scenario_options.index(st.session_state.scenario_prefab),
-                key="scenario_dropdown",
-                disabled=st.session_state.scenario_running,
-            )
-            
-            # Handle scenario dropdown change
-            if selected_scenario != st.session_state.scenario_prefab:
-                st.session_state.scenario_prefab = selected_scenario
-                if selected_scenario == "Create My Own":
-                    st.session_state.scenario_text = ""
+            # Setting Display (Read-Only) - Collapsible
+            with st.expander("**Setting**", expanded=st.session_state.expander_setting):
+                context = st.session_state.get("context_text_area", "")
+                tone = st.session_state.get("tone_text_area", "")
+                
+                if context:
+                    st.text_area("Context:", value=context, height=80, disabled=True, key="context_display_readonly")
                 else:
-                    st.session_state.scenario_text = SCENARIO_PREFABS[selected_scenario]
-                # Clear facts if scenario changed
-                if st.session_state.facts_generated:
-                    st.session_state.facts_json = ""
-                    st.session_state.facts_generated = False
-                st.rerun()
-            
-            scenario_text = st.text_area(
-                "Scenario",
-                value=st.session_state.scenario_text,
-                height=150,
-                key="scenario_text_area",
-                label_visibility="collapsed",
-                disabled=st.session_state.scenario_running,
-            )
-            
-            # Track scenario text changes
-            if scenario_text != st.session_state.get("prev_scenario_text", ""):
-                st.session_state.scenario_text = scenario_text
-                st.session_state.prev_scenario_text = scenario_text
-                # Clear facts if scenario changed
-                if st.session_state.facts_generated:
-                    st.session_state.facts_json = ""
-                    st.session_state.facts_generated = False
-            
-            st.divider()
-            
-            # Scene Configuration
-            st.markdown("**Scene**")
-            scene_options = list(SCENE_PREFABS.keys())
-            selected_scene = st.selectbox(
-                "Scene",
-                options=scene_options,
-                index=scene_options.index(st.session_state.scene_prefab),
-                key="scene_dropdown",
-                disabled=st.session_state.scenario_running,
-            )
-            
-            # Handle scene dropdown change
-            if selected_scene != st.session_state.scene_prefab:
-                st.session_state.scene_prefab = selected_scene
-                if selected_scene == "Create My Own":
-                    st.session_state.scene_text = ""
+                    st.info("No context configured.")
+                
+                if tone:
+                    st.text_area("Tone & Direction:", value=tone, height=80, disabled=True, key="tone_display_readonly")
                 else:
-                    st.session_state.scene_text = SCENE_PREFABS[selected_scene]
-                # Clear facts if scene changed
-                if st.session_state.facts_generated:
-                    st.session_state.facts_json = ""
-                    st.session_state.facts_generated = False
-                st.rerun()
+                    st.info("No tone configured.")
             
-            scene_text = st.text_area(
-                "Scene",
-                value=st.session_state.scene_text,
-                height=150,
-                key="scene_text_area",
-                label_visibility="collapsed",
-                disabled=st.session_state.scenario_running,
-            )
+            # Location Display (Read-Only) - Collapsible
+            with st.expander("**Location**", expanded=st.session_state.expander_location):
+                location = st.session_state.get("location_text", "")
+                if location:
+                    st.text_area("Location:", value=location, height=100, disabled=True, key="location_display_readonly")
+                else:
+                    st.info("No location configured.")
             
-            # Track scene text changes
-            if scene_text != st.session_state.get("prev_scene_text", ""):
-                st.session_state.scene_text = scene_text
-                st.session_state.prev_scene_text = scene_text
-                # Clear facts if scene changed
-                if st.session_state.facts_generated:
-                    st.session_state.facts_json = ""
-                    st.session_state.facts_generated = False
+            # Scenario Configuration - Collapsible
+            with st.expander("**Scenario**", expanded=st.session_state.expander_scenario):
+                scenario_options = list(SCENARIO_PREFABS.keys())
+                selected_scenario = st.selectbox(
+                    "Scenario",
+                    options=scenario_options,
+                    index=scenario_options.index(st.session_state.scenario_prefab),
+                    key="scenario_dropdown",
+                    disabled=st.session_state.scenario_running,
+                )
+                
+                # Handle scenario dropdown change
+                if selected_scenario != st.session_state.scenario_prefab:
+                    st.session_state.scenario_prefab = selected_scenario
+                    if selected_scenario == "Create My Own":
+                        st.session_state.scenario_text = ""
+                    else:
+                        st.session_state.scenario_text = SCENARIO_PREFABS[selected_scenario]
+                    # Clear facts if scenario changed
+                    if st.session_state.facts_generated:
+                        st.session_state.facts_json = ""
+                        st.session_state.facts_generated = False
+                    st.rerun()
+                
+                scenario_text = st.text_area(
+                    "Scenario",
+                    value=st.session_state.scenario_text,
+                    height=150,
+                    key="scenario_text_area",
+                    label_visibility="collapsed",
+                    disabled=st.session_state.scenario_running,
+                )
+                
+                # Track scenario text changes
+                if scenario_text != st.session_state.get("prev_scenario_text", ""):
+                    st.session_state.scenario_text = scenario_text
+                    st.session_state.prev_scenario_text = scenario_text
+                    # Clear facts if scenario changed
+                    if st.session_state.facts_generated:
+                        st.session_state.facts_json = ""
+                        st.session_state.facts_generated = False
             
-            st.divider()
+            # Scene Configuration - Collapsible
+            with st.expander("**Scene**", expanded=st.session_state.expander_scene):
+                scene_options = list(SCENE_PREFABS.keys())
+                selected_scene = st.selectbox(
+                    "Scene",
+                    options=scene_options,
+                    index=scene_options.index(st.session_state.scene_prefab),
+                    key="scene_dropdown",
+                    disabled=st.session_state.scenario_running,
+                )
+                
+                # Handle scene dropdown change
+                if selected_scene != st.session_state.scene_prefab:
+                    st.session_state.scene_prefab = selected_scene
+                    if selected_scene == "Create My Own":
+                        st.session_state.scene_text = ""
+                    else:
+                        st.session_state.scene_text = SCENE_PREFABS[selected_scene]
+                    # Clear facts if scene changed
+                    if st.session_state.facts_generated:
+                        st.session_state.facts_json = ""
+                        st.session_state.facts_generated = False
+                    st.rerun()
+                
+                scene_text = st.text_area(
+                    "Scene",
+                    value=st.session_state.scene_text,
+                    height=150,
+                    key="scene_text_area",
+                    label_visibility="collapsed",
+                    disabled=st.session_state.scenario_running,
+                )
+                
+                # Track scene text changes
+                if scene_text != st.session_state.get("prev_scene_text", ""):
+                    st.session_state.scene_text = scene_text
+                    st.session_state.prev_scene_text = scene_text
+                    # Clear facts if scene changed
+                    if st.session_state.facts_generated:
+                        st.session_state.facts_json = ""
+                        st.session_state.facts_generated = False
             
-            # Character List (Read-Only)
-            _render_character_list_readonly()
-            
-            st.divider()
+            # Character List (Read-Only) - Collapsible
+            with st.expander("**Character List**", expanded=st.session_state.expander_characters):
+                _render_character_list_readonly()
             
             # Generate Facts Button
             any_processing = st.session_state.generating_facts or st.session_state.processing_turn
@@ -487,8 +491,6 @@ def render() -> None:
                 st.info("Click Generate Facts to populate")
             elif _check_dirty_state():
                 st.warning("⚠ Regenerate Facts - upstream data has changed")
-            
-            st.divider()
             
             # Run Scenario Button
             facts_valid = False
@@ -524,35 +526,33 @@ def render() -> None:
                     st.session_state.scenario_turns = []
                     st.rerun()
         
-        # Bottom-left panel: Facts JSON Editor
-        st.divider()
-        st.subheader("Facts JSON Editor")
-        
-        facts_placeholder = "Click Generate Facts to populate"
-        facts_value = st.session_state.facts_json if st.session_state.facts_json else facts_placeholder
-        
-        facts_disabled = (
-            not st.session_state.facts_generated
-            or st.session_state.generating_facts
-            or st.session_state.processing_turn
-        )
-        
-        facts_text = st.text_area(
-            "Facts JSON",
-            value=facts_value if st.session_state.facts_generated else facts_placeholder,
-            height=400,
-            key="facts_json_editor",
-            label_visibility="collapsed",
-            disabled=facts_disabled,
-        )
-        
-        # Validate and update facts JSON
-        if st.session_state.facts_generated and facts_text != facts_placeholder:
-            is_valid, error_msg = _validate_json(facts_text)
-            if not is_valid:
-                st.error(f"Invalid JSON: {error_msg}")
-            else:
-                st.session_state.facts_json = facts_text
+        # Bottom-left panel: Facts JSON Editor - Collapsible
+        with st.expander("**Facts JSON Editor**", expanded=st.session_state.expander_facts_editor):
+            facts_placeholder = "Click Generate Facts to populate"
+            facts_value = st.session_state.facts_json if st.session_state.facts_json else facts_placeholder
+            
+            facts_disabled = (
+                not st.session_state.facts_generated
+                or st.session_state.generating_facts
+                or st.session_state.processing_turn
+            )
+            
+            facts_text = st.text_area(
+                "Facts JSON",
+                value=facts_value if st.session_state.facts_generated else facts_placeholder,
+                height=400,
+                key="facts_json_editor",
+                label_visibility="collapsed",
+                disabled=facts_disabled,
+            )
+            
+            # Validate and update facts JSON
+            if st.session_state.facts_generated and facts_text != facts_placeholder:
+                is_valid, error_msg = _validate_json(facts_text)
+                if not is_valid:
+                    st.error(f"Invalid JSON: {error_msg}")
+                else:
+                    st.session_state.facts_json = facts_text
     
     with right_col:
         # Right panel: Scenario Log
