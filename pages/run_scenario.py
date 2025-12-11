@@ -108,7 +108,7 @@ def _validate_json(json_str: str) -> tuple[bool, str | None]:
 
 
 async def _generate_facts_async() -> dict:
-    """Generate facts using the character_motivation workflow."""
+    """Generate facts using the fact_generation workflow."""
     context = st.session_state.get("context_text_area", "")
     tone = st.session_state.get("tone_text_area", "")
     location = st.session_state.get("location_text", "")
@@ -122,20 +122,23 @@ async def _generate_facts_async() -> dict:
         # Filter out metadata fields
         char_display = {k: v for k, v in char.items() if not k.startswith("_")}
         character_data.append(char_display)
-    
+
+    # Convert characters to JSON string as workflow expects
+    participants_json = json.dumps(character_data)
+
     flow_input = {
         "Start Flow": {
-            "context": context,
-            "tone": tone,
+            "setting_context": context,
+            "tone_and_direction": tone,
             "location": location,
-            "scenario": scenario,
-            "scene": scene,
-            "characters": character_data,
+            "scenario_description": scenario,
+            "scene_description": scene,
+            "participants": participants_json,
         }
     }
     
     manager = get_server_manager()
-    port = manager.get_port("character_motivation")
+    port = manager.get_port("fact_generation")
     
     if port is None:
         return {
@@ -146,28 +149,20 @@ async def _generate_facts_async() -> dict:
     
     try:
         output = await call_workflow_server(port, flow_input)
-        
+
         if "error" in output:
             return {
                 "was_successful": False,
                 "result_details": f"Workflow error: {output['error']}",
                 "facts": None,
             }
-        
+
         # Extract facts from workflow output
-        # The workflow should return facts in a structured format
-        # For now, we'll construct a basic facts structure
-        facts = {
-            "location": json.loads(location) if isinstance(location, str) and location.startswith("{") else {"description": location},
-            "scenario": json.loads(scenario) if isinstance(scenario, str) and scenario.startswith("{") else {"description": scenario},
-            "scene": json.loads(scene) if isinstance(scene, str) and scene.startswith("{") else {"description": scene},
-            "characters": character_data,
-        }
-        
+        # The workflow returns was_successful, result_details, and facts
         return {
-            "was_successful": True,
-            "result_details": "Facts generated successfully",
-            "facts": facts,
+            "was_successful": output.get("was_successful", True),
+            "result_details": output.get("result_details", "Facts generated successfully"),
+            "facts": output.get("facts"),
         }
     except Exception as e:
         logger.exception("Failed to generate facts")

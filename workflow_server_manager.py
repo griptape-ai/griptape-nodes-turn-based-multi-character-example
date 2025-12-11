@@ -25,6 +25,7 @@ class WorkflowConfig:
 # Hardcoded list of workflows - add more here as needed
 WORKFLOW_CONFIGS = [
     WorkflowConfig(name="Generate Character Portrait", module="generate_char_portrait", port=8005),
+    WorkflowConfig(name="Fact Generation", module="fact_generation", port=8006),
 ]
 
 
