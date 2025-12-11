@@ -6,6 +6,8 @@ from typing import Any
 
 import streamlit as st
 
+from utils import execute_portrait_generation
+
 
 # Silhouette placeholder image (using a data URI for a simple placeholder)
 SILHOUETTE_PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23ddd'/%3E%3Ctext x='50' y='50' text-anchor='middle' dy='.3em' fill='%23999'%3E?%3C/text%3E%3C/svg%3E"
@@ -98,17 +100,55 @@ def _validate_json(json_str: str) -> tuple[bool, str | None]:
         return False, str(e)
 
 
-def _generate_portrait(char_id: str, context: str, tone: str, char_data: dict) -> str | None:
+def _get_character_json_path(char_data: dict) -> str:
+    """Get the absolute path to an existing character JSON file."""
+    # Check if character was loaded from a prefab file
+    prefab_filename = char_data.get("_prefab_filename")
+
+    if prefab_filename:
+        # Use the original prefab filename
+        filepath = Path("characters") / prefab_filename
+    else:
+        # For "Create My Own" characters, construct filename from name
+        char_name = char_data.get("name", "unknown")
+        # Clean the name for use as filename
+        clean_name = "".join(c if c.isalnum() or c in (' ', '-', '_') else '_' for c in char_name)
+        clean_name = clean_name.replace(' ', '_').lower()
+        filename = f"{clean_name}.json"
+        filepath = Path("characters") / filename
+
+    return str(filepath.absolute())
+
+
+def _generate_portrait(char_id: str, context: str, tone: str, direction: str, char_data: dict) -> str | None:
     """Generate portrait for a character. Returns portrait URL or None."""
-    # TODO: Implement actual AI portrait generation
-    # For now, return None (will show silhouette)
-    # This should call the image generation workflow with:
-    # - context from Setting tab
-    # - tone from Setting tab
-    # - character data (appearance, etc.)
-    import time
-    time.sleep(0.1)  # Simulate brief generation time
-    return None
+    try:
+        # Get absolute path to existing character JSON file
+        char_path = _get_character_json_path(char_data)
+        char_name = char_data.get("name", "unknown")
+
+        # Create character name to JSON path mapping
+        character_name_to_json = {char_name: char_path}
+
+        # Call the portrait generation workflow
+        result = execute_portrait_generation(
+            context=context,
+            tone=tone,
+            direction=direction,
+            character_name_to_json=character_name_to_json,
+        )
+
+        if result.get("was_successful"):
+            # Extract portrait URL for this character
+            portraits = result.get("portraits", {})
+            portrait_url = portraits.get(char_name)
+            return portrait_url
+        else:
+            st.error(f"Portrait generation failed: {result.get('result_details')}")
+            return None
+    except Exception as e:
+        st.error(f"Portrait generation error: {e}")
+        return None
 
 
 def _get_prefab_options() -> list[str]:
@@ -355,27 +395,66 @@ def render() -> None:
         st.session_state.next_new_character_num += 1
         st.rerun()
     
-    # Handle portrait generation (simulated for now)
+    # Handle portrait generation
     if st.session_state.portrait_generating and st.session_state.portrait_generating_char_id:
-        # Simulate generation
+        # Get context and tone from session state
+        context = st.session_state.get("context_text_area", "")
+        tone = st.session_state.get("tone_text_area", "")
+        direction = tone  # direction is the same as tone in the UI
+
         char_id = st.session_state.portrait_generating_char_id
         for char in st.session_state.characters:
             if char.get("_id") == char_id:
-                # TODO: Call actual portrait generation
-                char["_portrait_url"] = None  # Placeholder
+                # Call actual portrait generation
+                portrait_url = _generate_portrait(char_id, context, tone, direction, char)
+                char["_portrait_url"] = portrait_url
                 char["_portrait_generated"] = True
                 char["_dirty"] = False  # Clear dirty state
                 break
         st.session_state.portrait_generating = False
         st.session_state.portrait_generating_char_id = None
         st.rerun()
-    
+
     if st.session_state.batch_portrait_generating:
-        # Simulate batch generation
+        # Get context and tone from session state
+        context = st.session_state.get("context_text_area", "")
+        tone = st.session_state.get("tone_text_area", "")
+        direction = tone  # direction is the same as tone in the UI
+
+        # Build character name to JSON path mapping for all dirty characters
+        character_name_to_json = {}
+        dirty_chars = []
+
         for char in st.session_state.characters:
-            # TODO: Call actual portrait generation
-            char["_portrait_url"] = None  # Placeholder
-            char["_portrait_generated"] = True
-            char["_dirty"] = False  # Clear dirty state
+            if char.get("_dirty", False):
+                dirty_chars.append(char)
+                char_path = _get_character_json_path(char)
+                char_name = char.get("name", "unknown")
+                character_name_to_json[char_name] = char_path
+
+        if character_name_to_json:
+            # Call portrait generation for all dirty characters at once
+            try:
+                result = execute_portrait_generation(
+                    context=context,
+                    tone=tone,
+                    direction=direction,
+                    character_name_to_json=character_name_to_json,
+                )
+
+                if result.get("was_successful"):
+                    portraits = result.get("portraits", {})
+                    # Update each character with their portrait
+                    for char in dirty_chars:
+                        char_name = char.get("name", "unknown")
+                        portrait_url = portraits.get(char_name)
+                        char["_portrait_url"] = portrait_url
+                        char["_portrait_generated"] = True
+                        char["_dirty"] = False
+                else:
+                    st.error(f"Batch portrait generation failed: {result.get('result_details')}")
+            except Exception as e:
+                st.error(f"Batch portrait generation error: {e}")
+
         st.session_state.batch_portrait_generating = False
         st.rerun()
