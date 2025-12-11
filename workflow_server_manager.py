@@ -24,8 +24,9 @@ class WorkflowConfig:
 
 # Hardcoded list of workflows - add more here as needed
 WORKFLOW_CONFIGS = [
-    WorkflowConfig(name="Poem Flow", module="poem_flow", port=8005),
-    WorkflowConfig(name="Image Flow", module="image_flow", port=8006),
+    WorkflowConfig(name="Character Generation Flow", module="character_generation_flow", port=8005),
+    WorkflowConfig(name="Character Image Flow", module="character_image_flow", port=8006),
+    WorkflowConfig(name="Story From Character", module="story_from_character", port=8007),
 ]
 
 
