@@ -120,15 +120,29 @@ def _get_character_json_path(char_data: dict) -> str:
     return str(filepath.absolute())
 
 
+def _load_character_json(char_data: dict) -> dict | None:
+    """Load character JSON data from file. Returns character data dict or None if failed."""
+    try:
+        char_path = _get_character_json_path(char_data)
+        with open(char_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        st.error(f"Failed to load character JSON from {char_path}: {e}")
+        return None
+
+
 def _generate_portrait(char_id: str, context: str, tone: str, direction: str, char_data: dict) -> str | None:
     """Generate portrait for a character. Returns portrait URL or None."""
     try:
-        # Get absolute path to existing character JSON file
-        char_path = _get_character_json_path(char_data)
-        char_name = char_data.get("name", "unknown")
+        # Load character JSON data from file
+        loaded_char_data = _load_character_json(char_data)
+        if loaded_char_data is None:
+            return None
+        
+        char_name = loaded_char_data.get("name", "unknown")
 
-        # Create character name to JSON path mapping
-        character_name_to_json = {char_name: char_path}
+        # Create character name to JSON data mapping (passing actual data, not file path)
+        character_name_to_json = {char_name: loaded_char_data}
 
         # Call the portrait generation workflow
         result = execute_portrait_generation(
@@ -421,16 +435,19 @@ def render() -> None:
         tone = st.session_state.get("tone_text_area", "")
         direction = tone  # direction is the same as tone in the UI
 
-        # Build character name to JSON path mapping for all dirty characters
+        # Build character name to JSON data mapping for all dirty characters
+        # Load JSON files and pass actual character data, not file paths
         character_name_to_json = {}
-        dirty_chars = []
+        char_name_to_char = {}  # Map character name back to char dict for updating portraits
 
         for char in st.session_state.characters:
             if char.get("_dirty", False):
-                dirty_chars.append(char)
-                char_path = _get_character_json_path(char)
-                char_name = char.get("name", "unknown")
-                character_name_to_json[char_name] = char_path
+                # Load character JSON data from file
+                loaded_char_data = _load_character_json(char)
+                if loaded_char_data is not None:
+                    char_name = loaded_char_data.get("name", "unknown")
+                    character_name_to_json[char_name] = loaded_char_data
+                    char_name_to_char[char_name] = char
 
         if character_name_to_json:
             # Call portrait generation for all dirty characters at once
@@ -445,8 +462,7 @@ def render() -> None:
                 if result.get("was_successful"):
                     portraits = result.get("portraits", {})
                     # Update each character with their portrait
-                    for char in dirty_chars:
-                        char_name = char.get("name", "unknown")
+                    for char_name, char in char_name_to_char.items():
                         portrait_url = portraits.get(char_name)
                         char["_portrait_url"] = portrait_url
                         char["_portrait_generated"] = True
