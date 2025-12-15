@@ -75,7 +75,6 @@ def render() -> None:
     # Context Text Area
     st.text_area(
         "Context",
-        value=st.session_state.context_text_area,
         height=150,
         key="context_text_area",
         label_visibility="collapsed",
@@ -111,7 +110,6 @@ def render() -> None:
     # Tone & Direction Text Area
     st.text_area(
         "Tone & Direction",
-        value=st.session_state.tone_text_area,
         height=150,
         key="tone_text_area",
         label_visibility="collapsed",
