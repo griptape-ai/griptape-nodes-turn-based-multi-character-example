@@ -14,6 +14,25 @@ st.set_page_config(
     page_title="Griptape Nodes Turn-Based Multi-Character Example",
     page_icon="🎵",
     layout="wide",
+    initial_sidebar_state="collapsed",
+)
+
+# Hide the sidebar navigation
+st.markdown(
+    """
+    <style>
+        [data-testid="stSidebar"] {
+            display: none;
+        }
+        [data-testid="stSidebar"][aria-expanded="true"] {
+            display: none;
+        }
+        [data-testid="stSidebar"][aria-expanded="false"] {
+            display: none;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
 )
 
 
