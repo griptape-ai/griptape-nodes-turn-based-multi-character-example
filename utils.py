@@ -47,7 +47,6 @@ async def call_workflow_server(port: int, flow_input: dict) -> dict:
 async def execute_portrait_generation_async(
     context: str,
     tone: str,
-    direction: str,
     character_name_to_json: dict,
 ) -> dict:
     """Execute the portrait generation workflow via HTTP.
@@ -55,8 +54,7 @@ async def execute_portrait_generation_async(
     Args:
         context: The world context from Setting
         tone: The tone from Setting
-        direction: The direction from Setting (same as tone in the UI)
-        character_name_to_json: Dictionary mapping character names to their JSON file paths
+        character_name_to_json: Dictionary mapping character names to their JSON data as strings
 
     Returns:
         dict: Contains workflow output including portrait images
@@ -64,14 +62,12 @@ async def execute_portrait_generation_async(
     logger.info("=== PORTRAIT GENERATION WORKFLOW ===")
     logger.info(f"Input - context: {context}")
     logger.info(f"Input - tone: {tone}")
-    logger.info(f"Input - direction: {direction}")
     logger.info(f"Input - character_name_to_json: {character_name_to_json}")
 
     flow_input = {
         "Start Flow": {
             "context": context,
             "tone": tone,
-            "direction": direction,
             "character_name_to_json": character_name_to_json,
         }
     }
@@ -143,7 +139,6 @@ async def execute_portrait_generation_async(
 def execute_portrait_generation(
     context: str,
     tone: str,
-    direction: str,
     character_name_to_json: dict,
 ) -> dict:
     """Synchronous wrapper for portrait generation workflow.
@@ -151,8 +146,7 @@ def execute_portrait_generation(
     Args:
         context: The world context from Setting
         tone: The tone from Setting
-        direction: The direction from Setting (same as tone in the UI)
-        character_name_to_json: Dictionary mapping character names to their JSON file paths
+        character_name_to_json: Dictionary mapping character names to their JSON data as strings
 
     Returns:
         dict: Contains workflow output including portrait images
@@ -161,7 +155,6 @@ def execute_portrait_generation(
         execute_portrait_generation_async(
             context=context,
             tone=tone,
-            direction=direction,
             character_name_to_json=character_name_to_json,
         )
     )
