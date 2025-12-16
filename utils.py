@@ -56,7 +56,7 @@ async def execute_portrait_generation_async(
         context: The world context from Setting
         tone: The tone from Setting
         direction: The direction from Setting (same as tone in the UI)
-        character_name_to_json: Dictionary mapping character names to their JSON file paths
+        character_name_to_json: Dictionary mapping character names to their character data (dict)
 
     Returns:
         dict: Contains workflow output including portrait images
@@ -152,7 +152,7 @@ def execute_portrait_generation(
         context: The world context from Setting
         tone: The tone from Setting
         direction: The direction from Setting (same as tone in the UI)
-        character_name_to_json: Dictionary mapping character names to their JSON file paths
+        character_name_to_json: Dictionary mapping character names to their character data (dict)
 
     Returns:
         dict: Contains workflow output including portrait images
