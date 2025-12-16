@@ -100,41 +100,27 @@ def _validate_json(json_str: str) -> tuple[bool, str | None]:
         return False, str(e)
 
 
-def _get_character_json_path(char_data: dict) -> str:
-    """Get the absolute path to an existing character JSON file."""
-    # Check if character was loaded from a prefab file
-    prefab_filename = char_data.get("_prefab_filename")
-
-    if prefab_filename:
-        # Use the original prefab filename
-        filepath = Path("characters") / prefab_filename
-    else:
-        # For "Create My Own" characters, construct filename from name
-        char_name = char_data.get("name", "unknown")
-        # Clean the name for use as filename
-        clean_name = "".join(c if c.isalnum() or c in (' ', '-', '_') else '_' for c in char_name)
-        clean_name = clean_name.replace(' ', '_').lower()
-        filename = f"{clean_name}.json"
-        filepath = Path("characters") / filename
-
-    return str(filepath.absolute())
+def _get_character_json_string(char_data: dict) -> str:
+    """Get the character data as a JSON string."""
+    # Filter out metadata fields (those starting with _)
+    display_data = {k: v for k, v in char_data.items() if not k.startswith("_")}
+    return json.dumps(display_data)
 
 
-def _generate_portrait(char_id: str, context: str, tone: str, direction: str, char_data: dict) -> str | None:
+def _generate_portrait(char_id: str, context: str, tone: str, char_data: dict) -> str | None:
     """Generate portrait for a character. Returns portrait URL or None."""
     try:
-        # Get absolute path to existing character JSON file
-        char_path = _get_character_json_path(char_data)
+        # Get character data as JSON string
+        char_json_string = _get_character_json_string(char_data)
         char_name = char_data.get("name", "unknown")
 
-        # Create character name to JSON path mapping
-        character_name_to_json = {char_name: char_path}
+        # Create character name to JSON string mapping
+        character_name_to_json = {char_name: char_json_string}
 
         # Call the portrait generation workflow
         result = execute_portrait_generation(
             context=context,
             tone=tone,
-            direction=direction,
             character_name_to_json=character_name_to_json,
         )
 
@@ -400,13 +386,12 @@ def render() -> None:
         # Get context and tone from session state
         context = st.session_state.get("context_text_area", "")
         tone = st.session_state.get("tone_text_area", "")
-        direction = tone  # direction is the same as tone in the UI
 
         char_id = st.session_state.portrait_generating_char_id
         for char in st.session_state.characters:
             if char.get("_id") == char_id:
                 # Call actual portrait generation
-                portrait_url = _generate_portrait(char_id, context, tone, direction, char)
+                portrait_url = _generate_portrait(char_id, context, tone, char)
                 char["_portrait_url"] = portrait_url
                 char["_portrait_generated"] = True
                 char["_dirty"] = False  # Clear dirty state
@@ -419,18 +404,17 @@ def render() -> None:
         # Get context and tone from session state
         context = st.session_state.get("context_text_area", "")
         tone = st.session_state.get("tone_text_area", "")
-        direction = tone  # direction is the same as tone in the UI
 
-        # Build character name to JSON path mapping for all dirty characters
+        # Build character name to JSON string mapping for all dirty characters
         character_name_to_json = {}
         dirty_chars = []
 
         for char in st.session_state.characters:
             if char.get("_dirty", False):
                 dirty_chars.append(char)
-                char_path = _get_character_json_path(char)
+                char_json_string = _get_character_json_string(char)
                 char_name = char.get("name", "unknown")
-                character_name_to_json[char_name] = char_path
+                character_name_to_json[char_name] = char_json_string
 
         if character_name_to_json:
             # Call portrait generation for all dirty characters at once
@@ -438,7 +422,6 @@ def render() -> None:
                 result = execute_portrait_generation(
                     context=context,
                     tone=tone,
-                    direction=direction,
                     character_name_to_json=character_name_to_json,
                 )
 
