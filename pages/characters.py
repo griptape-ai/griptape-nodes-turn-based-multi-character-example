@@ -31,11 +31,16 @@ def load_character_prefabs() -> list[dict]:
     return prefabs
 
 
+def get_character_prefabs() -> list[dict]:
+    """Get character prefabs from session state (loaded at app startup)."""
+    return st.session_state.get("character_prefabs", [])
+
+
 def _initialize_characters_state() -> None:
     """Initialize characters state with default pre-selected characters."""
     if "characters" not in st.session_state:
-        # Load 5-6 pre-selected characters
-        prefabs = load_character_prefabs()
+        # Get pre-loaded prefabs from session state
+        prefabs = get_character_prefabs()
         initial_characters = []
         
         # Select first 5-6 characters as initial
@@ -167,7 +172,7 @@ def _generate_portrait(char_id: str, context: str, tone: str, direction: str, ch
 
 def _get_prefab_options() -> list[str]:
     """Get list of pre-fab option names."""
-    prefabs = load_character_prefabs()
+    prefabs = get_character_prefabs()
     options = [prefab.get("name", "Unknown") for prefab in prefabs]
     options.append("Create My Own")
     return options
@@ -177,7 +182,7 @@ def _get_prefab_by_name(name: str) -> dict | None:
     """Get pre-fab data by name."""
     if name == "Create My Own":
         return None
-    prefabs = load_character_prefabs()
+    prefabs = get_character_prefabs()
     for prefab in prefabs:
         if prefab.get("name") == name:
             return prefab

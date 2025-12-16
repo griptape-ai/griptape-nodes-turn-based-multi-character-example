@@ -38,6 +38,10 @@ st.markdown(
 
 def main() -> None:
     """Main Streamlit application."""
+    # Load character prefabs at app startup
+    if "character_prefabs" not in st.session_state:
+        st.session_state.character_prefabs = characters.load_character_prefabs()
+    
     # Ensure workflow servers are started
     get_server_manager()
 
