@@ -44,7 +44,7 @@ def _initialize_characters_state() -> None:
             char_data["_id"] = f"char_{i}"
             char_data["_prefab_name"] = prefab.get("name", "Unknown")
             char_data["_expanded"] = False
-            char_data["_dirty"] = False
+            char_data["_dirty"] = True  # Characters are dirty on load and need portraits generated
             char_data["_portrait_generated"] = False
             char_data["_portrait_url"] = None
             initial_characters.append(char_data)
@@ -87,8 +87,9 @@ def _check_setting_changed() -> None:
         # Check if we've already marked characters dirty for this setting change
         last_setting_dirty = st.session_state.get("_last_setting_dirty_state", False)
         if setting_dirty != last_setting_dirty:
-            _mark_all_characters_dirty()
+            # Update state tracking BEFORE marking dirty to prevent rerun during tab navigation
             st.session_state._last_setting_dirty_state = setting_dirty
+            _mark_all_characters_dirty()
 
 
 def _validate_json(json_str: str) -> tuple[bool, str | None]:
@@ -334,8 +335,12 @@ def render() -> None:
     """Render the Characters page."""
     _initialize_characters_state()
     _check_setting_changed()
-    
-    st.header("Characters")
+
+    # Show indicator if setting changed and characters need regeneration
+    setting_dirty = st.session_state.get("setting_dirty", False)
+    header_text = "Characters*" if setting_dirty else "Characters"
+
+    st.header(header_text)
     st.markdown("Define characters with facts, generate AI portraits based on Setting + character facts.")
     
     # Top button: Regenerate Updated Characters

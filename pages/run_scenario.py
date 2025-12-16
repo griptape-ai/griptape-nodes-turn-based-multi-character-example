@@ -349,8 +349,12 @@ def _render_turn_log(turn: dict) -> None:
 def render() -> None:
     """Render the Run Scenario page."""
     _initialize_run_scenario_state()
-    
-    st.header("Run Scenario")
+
+    # Show indicator if location changed and needs updating
+    location_dirty = st.session_state.get("location_dirty", False)
+    header_text = "Run Scenario*" if location_dirty else "Run Scenario"
+
+    st.header(header_text)
     st.markdown("Configure and execute turn-based multi-character role-playing scenarios.")
     
     # Three-panel layout

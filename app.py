@@ -44,16 +44,8 @@ def main() -> None:
     # App header with title
     st.title("Griptape Nodes Turn-Based Multi-Character Example")
     
-    # Check if setting is dirty to show asterisk on Characters tab
-    setting_dirty = st.session_state.get("setting_dirty", False)
-    characters_label = "Characters*" if setting_dirty else "Characters"
-    
-    # Check if location is dirty to show asterisk on Run Scenario tab
-    location_dirty = st.session_state.get("location_dirty", False)
-    run_scenario_label = "Run Scenario*" if location_dirty else "Run Scenario"
-    
-    # Create tabs
-    tab1, tab2, tab3, tab4 = st.tabs(["Setting", characters_label, "Location", run_scenario_label])
+    # Create tabs with static labels to prevent tab reset on label changes
+    tab1, tab2, tab3, tab4 = st.tabs(["Setting", "Characters", "Location", "Run Scenario"])
 
     with tab1:
         setting.render()
