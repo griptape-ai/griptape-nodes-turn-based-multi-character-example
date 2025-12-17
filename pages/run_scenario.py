@@ -295,14 +295,14 @@ def _render_turn_log(turn: dict) -> None:
                 char_data = next((c for c in characters if c.get("name") == char_name), None)
                 portrait_url = char_data.get("_portrait_url") if char_data else None
                 portrait_display = portrait_url if portrait_url else SILHOUETTE_PLACEHOLDER
-                st.image(portrait_display, width=60, use_container_width=False)
+                st.image(portrait_display, width=60)
             
             with col2:
                 st.markdown(f"**{char_name}**: {action_text}")
             
             with col3:
                 expand_icon = "▼" if is_expanded else "▶"
-                if st.button(expand_icon, key=f"expand_action_{turn_num}_{char_name}", use_container_width=True):
+                if st.button(expand_icon, key=f"expand_action_{turn_num}_{char_name}", width='stretch'):
                     action["_expanded"] = not is_expanded
                     st.rerun()
             
@@ -323,7 +323,7 @@ def _render_turn_log(turn: dict) -> None:
         
         with col2:
             expand_icon = "▼" if is_adj_expanded else "▶"
-            if st.button(expand_icon, key=f"expand_adj_{turn_num}", use_container_width=True):
+            if st.button(expand_icon, key=f"expand_adj_{turn_num}", width='stretch'):
                 adjudication["_expanded"] = not is_adj_expanded
                 st.rerun()
         
@@ -333,7 +333,7 @@ def _render_turn_log(turn: dict) -> None:
     
     # Next Turn button (only for the last turn)
     if turn_num == st.session_state.current_turn:
-        if st.button("Next Turn", key=f"next_turn_{turn_num}", use_container_width=True):
+        if st.button("Next Turn", key=f"next_turn_{turn_num}", width='stretch'):
             st.session_state.processing_turn = True
             st.rerun()
 
@@ -472,7 +472,7 @@ def render() -> None:
                 generate_label,
                 key="generate_facts",
                 disabled=any_processing or st.session_state.scenario_running,
-                use_container_width=True,
+                width='stretch',
                 type="primary",
             ):
                 st.session_state.generating_facts = True
@@ -503,7 +503,7 @@ def render() -> None:
                 run_label,
                 key="run_scenario",
                 disabled=not can_run and not st.session_state.scenario_running,
-                use_container_width=True,
+                width='stretch',
                 type="primary" if not st.session_state.scenario_running else "secondary",
             ):
                 if st.session_state.scenario_running:
@@ -586,6 +586,7 @@ def render() -> None:
         try:
             turn_num = st.session_state.current_turn + 1
             result = asyncio.run(_execute_turn_async(turn_num))
+            logger.info(f"Turn {turn_num} response: {json.dumps(result, indent=2)}")
             if result.get("was_successful"):
                 turn_data = result.get("turn_data", {})
                 st.session_state.scenario_turns.append(turn_data)
@@ -595,6 +596,7 @@ def render() -> None:
             else:
                 st.error(f"✗ Turn {turn_num} failed: {result.get('result_details', 'Unknown error')}")
         except Exception as e:
+            logger.exception(f"Turn execution failed: {e}")
             st.error(f"✗ Turn execution failed: {e}")
         finally:
             st.session_state.processing_turn = False

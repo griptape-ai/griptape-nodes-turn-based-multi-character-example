@@ -294,7 +294,7 @@ def render_character_row(char_data: dict, index: int) -> None:
                     button_label,
                     key=f"regenerate_{char_id}",
                     disabled=any_generating,
-                    use_container_width=True,
+                    width='stretch',
                 ):
                     st.session_state.portrait_generating = True
                     st.session_state.portrait_generating_char_id = char_id
@@ -305,7 +305,7 @@ def render_character_row(char_data: dict, index: int) -> None:
                     "Delete",
                     key=f"delete_{char_id}",
                     disabled=any_generating,
-                    use_container_width=True,
+                    width='stretch',
                 ):
                     st.session_state.characters = [
                         c for c in st.session_state.characters if c.get("_id") != char_id
@@ -329,7 +329,7 @@ def render() -> None:
         button_label,
         key="regenerate_all",
         disabled=any_generating,
-        use_container_width=True,
+        width='stretch',
         type="primary",
     ):
         st.session_state.batch_portrait_generating = True
@@ -349,7 +349,7 @@ def render() -> None:
         "+ Add Character",
         key="add_character",
         disabled=any_generating,
-        use_container_width=True,
+        width='stretch',
     ):
         new_char = _create_new_character_json(st.session_state.next_new_character_num)
         new_char["_id"] = f"char_{st.session_state.next_character_id}"
