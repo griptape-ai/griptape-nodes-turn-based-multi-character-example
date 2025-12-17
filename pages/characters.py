@@ -182,37 +182,22 @@ def render_character_row(char_data: dict, index: int) -> None:
     else:
         portrait_display = SILHOUETTE_PLACEHOLDER
     
-    # Row header (clickable to expand/collapse)
-    col1, col2, col3 = st.columns([0.12, 0.75, 0.13])
+    # Character name with asterisk if dirty
+    name_display = f"{char_name}{' *' if is_dirty else ''}"
     
-    with col1:
-        # Portrait thumbnail
-        if is_generating:
-            with st.spinner(""):
+    # Use expander instead of button - expander icon automatically on the right
+    with st.expander(f"**{name_display}**", expanded=is_expanded):
+        # Add slight indentation
+        _, content_col, _ = st.columns([0.02, 0.96, 0.02])
+        
+        with content_col:
+            # Portrait thumbnail
+            if is_generating:
+                with st.spinner(""):
+                    st.image(portrait_display, width=80, use_container_width=False)
+            else:
                 st.image(portrait_display, width=80, use_container_width=False)
-        else:
-            st.image(portrait_display, width=80, use_container_width=False)
-    
-    with col2:
-        # Character name with asterisk if dirty
-        name_display = f"{char_name}{' *' if is_dirty else ''}"
-        st.markdown(f"**{name_display}**")
-    
-    with col3:
-        # Expand/collapse button
-        expand_icon = "▼" if is_expanded else "▶"
-        expand_label = "Collapse" if is_expanded else "Expand"
-        if st.button(
-            expand_icon,
-            key=f"expand_{char_id}",
-            help=expand_label,
-            use_container_width=True,
-        ):
-            char_data["_expanded"] = not is_expanded
-            st.rerun()
-    
-    # Expanded content (outside column layout)
-    if is_expanded:
+            
             st.divider()
             
             # Pre-fab dropdown
@@ -326,8 +311,6 @@ def render_character_row(char_data: dict, index: int) -> None:
                         c for c in st.session_state.characters if c.get("_id") != char_id
                     ]
                     st.rerun()
-        
-            st.divider()
 
 
 def render() -> None:
