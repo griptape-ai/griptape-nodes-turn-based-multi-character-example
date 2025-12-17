@@ -259,7 +259,7 @@ def _render_character_list_readonly() -> None:
             
             with content_col:
                 # Portrait thumbnail
-                st.image(portrait_display, width=60, use_container_width=False)
+                st.image(portrait_display, width=60)
                 
                 st.divider()
                 

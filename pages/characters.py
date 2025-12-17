@@ -194,9 +194,9 @@ def render_character_row(char_data: dict, index: int) -> None:
             # Portrait thumbnail
             if is_generating:
                 with st.spinner(""):
-                    st.image(portrait_display, width=80, use_container_width=False)
+                    st.image(portrait_display, width=80)
             else:
-                st.image(portrait_display, width=80, use_container_width=False)
+                st.image(portrait_display, width=80)
             
             st.divider()
             
