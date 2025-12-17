@@ -55,6 +55,8 @@ def _initialize_run_scenario_state() -> None:
         st.session_state.scene_text = SCENE_PREFABS["Throne Room Confrontation"]
     if "facts_json" not in st.session_state:
         st.session_state.facts_json = ""
+    if "facts_json_editor" not in st.session_state:
+        st.session_state.facts_json_editor = ""
     if "facts_generated" not in st.session_state:
         st.session_state.facts_generated = False
     if "generating_facts" not in st.session_state:
@@ -171,11 +173,12 @@ async def _generate_facts_async() -> dict:
             }
 
         # Extract facts from workflow output
-        # The workflow returns was_successful, result_details, and facts
+        # The workflow returns was_successful, result_details, and facts inside "End Flow"
+        end_flow = output.get("End Flow", {})
         return {
-            "was_successful": output.get("was_successful", True),
-            "result_details": output.get("result_details", "Facts generated successfully"),
-            "facts": output.get("facts"),
+            "was_successful": end_flow.get("was_successful", True),
+            "result_details": end_flow.get("result_details", "Facts generated successfully"),
+            "facts": end_flow.get("facts"),
         }
     except Exception as e:
         logger.exception("Failed to generate facts")
@@ -350,6 +353,46 @@ def render() -> None:
     """Render the Run Scenario page."""
     _initialize_run_scenario_state()
     
+    # Handle Generate Facts workflow
+    if st.session_state.generating_facts:
+        try:
+            result = asyncio.run(_generate_facts_async())
+            if result.get("was_successful"):
+                facts = result.get("facts", {})
+                facts_str = json.dumps(facts, indent=2)
+                st.session_state.facts_json = facts_str
+                st.session_state.facts_json_editor = facts_str  # Update the widget state directly
+                st.session_state.facts_generated = True
+                st.session_state.prev_scenario_text = st.session_state.scenario_text
+                st.session_state.prev_scene_text = st.session_state.scene_text
+                st.success("✓ Facts generated successfully!")
+            else:
+                st.error(f"✗ Failed to generate facts: {result.get('result_details', 'Unknown error')}")
+        except Exception as e:
+            st.error(f"✗ Facts generation failed: {e}")
+        finally:
+            st.session_state.generating_facts = False
+            st.rerun()
+    
+    # Handle turn processing
+    if st.session_state.processing_turn and st.session_state.scenario_running:
+        try:
+            turn_num = st.session_state.current_turn + 1
+            result = asyncio.run(_execute_turn_async(turn_num))
+            logger.info(f"Turn {turn_num} response: {json.dumps(result, indent=2)}")
+            if result.get("was_successful"):
+                turn_data = result.get("turn_data", {})
+                st.session_state.scenario_turns.append(turn_data)
+                st.session_state.current_turn = turn_num
+            else:
+                st.error(f"✗ Turn {turn_num} failed: {result.get('result_details', 'Unknown error')}")
+        except Exception as e:
+            logger.exception(f"Turn execution failed: {e}")
+            st.error(f"✗ Turn execution failed: {e}")
+        finally:
+            st.session_state.processing_turn = False
+            st.rerun()
+
     st.header("Run Scenario")
     st.markdown("Configure and execute turn-based multi-character role-playing scenarios.")
     
@@ -405,6 +448,7 @@ def render() -> None:
                     # Clear facts if scenario changed
                     if st.session_state.facts_generated:
                         st.session_state.facts_json = ""
+                        st.session_state.facts_json_editor = ""
                         st.session_state.facts_generated = False
                     st.rerun()
                 
@@ -424,6 +468,7 @@ def render() -> None:
                     # Clear facts if scenario changed
                     if st.session_state.facts_generated:
                         st.session_state.facts_json = ""
+                        st.session_state.facts_json_editor = ""
                         st.session_state.facts_generated = False
             
             # Scene Configuration - Collapsible
@@ -528,26 +573,27 @@ def render() -> None:
         
         # Bottom-left panel: Facts JSON Editor - Collapsible
         with st.expander("**Facts JSON Editor**", expanded=st.session_state.expander_facts_editor):
-            facts_placeholder = "Click Generate Facts to populate"
-            facts_value = st.session_state.facts_json if st.session_state.facts_json else facts_placeholder
-            
             facts_disabled = (
                 not st.session_state.facts_generated
                 or st.session_state.generating_facts
                 or st.session_state.processing_turn
             )
             
+            # If we just generated facts, ensure the editor has the content
+            if st.session_state.facts_generated and not st.session_state.facts_json_editor:
+                st.session_state.facts_json_editor = st.session_state.facts_json
+
             facts_text = st.text_area(
                 "Facts JSON",
-                value=facts_value if st.session_state.facts_generated else facts_placeholder,
                 height=400,
                 key="facts_json_editor",
                 label_visibility="collapsed",
                 disabled=facts_disabled,
+                placeholder="Click Generate Facts to populate",
             )
             
-            # Validate and update facts JSON
-            if st.session_state.facts_generated and facts_text != facts_placeholder:
+            # Validate and update facts JSON from editor changes
+            if st.session_state.facts_generated and facts_text:
                 is_valid, error_msg = _validate_json(facts_text)
                 if not is_valid:
                     st.error(f"Invalid JSON: {error_msg}")
@@ -569,43 +615,4 @@ def render() -> None:
             if st.session_state.processing_turn:
                 with st.spinner(f"Processing Turn {st.session_state.current_turn + 1}..."):
                     pass
-    
-    # Handle Generate Facts workflow
-    if st.session_state.generating_facts:
-        try:
-            result = asyncio.run(_generate_facts_async())
-            if result.get("was_successful"):
-                facts = result.get("facts", {})
-                st.session_state.facts_json = json.dumps(facts, indent=2)
-                st.session_state.facts_generated = True
-                st.session_state.prev_scenario_text = st.session_state.scenario_text
-                st.session_state.prev_scene_text = st.session_state.scene_text
-                st.success("✓ Facts generated successfully!")
-            else:
-                st.error(f"✗ Failed to generate facts: {result.get('result_details', 'Unknown error')}")
-        except Exception as e:
-            st.error(f"✗ Facts generation failed: {e}")
-        finally:
-            st.session_state.generating_facts = False
-            st.rerun()
-    
-    # Handle turn processing
-    if st.session_state.processing_turn and st.session_state.scenario_running:
-        try:
-            turn_num = st.session_state.current_turn + 1
-            result = asyncio.run(_execute_turn_async(turn_num))
-            logger.info(f"Turn {turn_num} response: {json.dumps(result, indent=2)}")
-            if result.get("was_successful"):
-                turn_data = result.get("turn_data", {})
-                st.session_state.scenario_turns.append(turn_data)
-                st.session_state.current_turn = turn_num
-                # Update facts JSON with changes from turn
-                # TODO: Apply fact changes from adjudication
-            else:
-                st.error(f"✗ Turn {turn_num} failed: {result.get('result_details', 'Unknown error')}")
-        except Exception as e:
-            logger.exception(f"Turn execution failed: {e}")
-            st.error(f"✗ Turn execution failed: {e}")
-        finally:
-            st.session_state.processing_turn = False
-            st.rerun()
+
