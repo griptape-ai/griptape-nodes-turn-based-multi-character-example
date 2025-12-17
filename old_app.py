@@ -219,7 +219,7 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
     if st.button(
         "Re-run poem workflow",
         type="primary",
-        use_container_width=True,
+        width='stretch',
         disabled=st.session_state.poem_workflow_running,
         key="rerun_poem_button",
     ):
@@ -249,7 +249,7 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
     if st.button(
         "Re-run image workflow",
         type="primary",
-        use_container_width=True,
+        width='stretch',
         disabled=st.session_state.image_workflow_running,
         key="rerun_image_button",
     ):
@@ -288,7 +288,7 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915
         if image_artifact:
             image_url = get_image_artifact_value(image_artifact)
             if image_url:
-                st.image(image_url, caption="Generated Image", use_container_width=True)
+                st.image(image_url, caption="Generated Image", width='stretch')
             else:
                 st.warning("No image URL found in the workflow output.")
 
