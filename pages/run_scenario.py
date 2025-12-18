@@ -393,7 +393,10 @@ def render() -> None:
             st.session_state.processing_turn = False
             st.rerun()
 
-    st.header("Run Scenario")
+    is_dirty = _check_dirty_state()
+    header_text = "Run Scenario*" if is_dirty else "Run Scenario"
+    st.header(header_text)
+    
     st.markdown("Configure and execute turn-based multi-character role-playing scenarios.")
     
     # Three-panel layout
