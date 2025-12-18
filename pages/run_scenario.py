@@ -236,8 +236,6 @@ def _render_character_list_readonly() -> None:
         st.info("No characters available. Go to the Characters tab to add characters.")
         return
     
-    # Character List subheader removed - now handled by expander
-    
     for char in characters:
         char_id = char.get("_id", "")
         char_name = char.get("name", "NO NAME PROVIDED")
@@ -251,29 +249,23 @@ def _render_character_list_readonly() -> None:
         else:
             portrait_display = SILHOUETTE_PLACEHOLDER
         
-        # Character row header
-        col1, col2, col3 = st.columns([0.12, 0.75, 0.13])
+        # Character name with asterisk if dirty
+        name_display = f"{char_name}{' *' if is_dirty else ''}"
         
-        with col1:
-            st.image(portrait_display, width=60)
-        
-        with col2:
-            name_display = f"{char_name}{' *' if is_dirty else ''}"
-            st.markdown(f"**{name_display}**")
-        
-        with col3:
-            expand_icon = "▼" if is_expanded else "▶"
-            if st.button(expand_icon, key=f"expand_readonly_{char_id}", width='stretch'):
-                char["_expanded_readonly"] = not is_expanded
-                st.rerun()
-        
-        # Expanded view
-        if is_expanded:
-            st.divider()
-            # Display character JSON (read-only)
-            display_data = {k: v for k, v in char.items() if not k.startswith("_")}
-            st.json(display_data)
-            st.divider()
+        # Use expander instead of button - expander icon automatically on the right
+        with st.expander(f"**{name_display}**", expanded=is_expanded):
+            # Add slight indentation
+            _, content_col, _ = st.columns([0.02, 0.96, 0.02])
+            
+            with content_col:
+                # Portrait thumbnail
+                st.image(portrait_display, width=60)
+                
+                st.divider()
+                
+                # Display character JSON (read-only)
+                display_data = {k: v for k, v in char.items() if not k.startswith("_")}
+                st.json(display_data)
 
 
 def _render_turn_log(turn: dict) -> None:
