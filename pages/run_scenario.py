@@ -82,10 +82,17 @@ def _initialize_run_scenario_state() -> None:
         st.session_state.expander_characters = True
     if "expander_facts_editor" not in st.session_state:
         st.session_state.expander_facts_editor = True
+    # Initialize prev values only if facts have been generated
+    # Don't initialize them here - let _check_dirty_state handle it
+    # or set them when facts are generated
 
 
 def _check_dirty_state() -> bool:
     """Check if any upstream data is dirty (requires Generate Facts to be re-run)."""
+    # If facts haven't been generated yet, nothing is dirty
+    if not st.session_state.get("facts_generated", False):
+        return False
+    
     # Check if setting is dirty
     if st.session_state.get("setting_dirty", False):
         return True
@@ -98,15 +105,13 @@ def _check_dirty_state() -> bool:
         if char.get("_dirty", False):
             return True
     # Check if scenario or scene changed
-    if "prev_scenario_text" not in st.session_state:
-        st.session_state.prev_scenario_text = st.session_state.get("scenario_text", "")
-    if "prev_scene_text" not in st.session_state:
-        st.session_state.prev_scene_text = st.session_state.get("scene_text", "")
-    
-    if st.session_state.get("scenario_text", "") != st.session_state.prev_scenario_text:
-        return True
-    if st.session_state.get("scene_text", "") != st.session_state.prev_scene_text:
-        return True
+    # Only check if prev values exist (they should exist if facts were generated)
+    if "prev_scenario_text" in st.session_state:
+        if st.session_state.get("scenario_text", "") != st.session_state.prev_scenario_text:
+            return True
+    if "prev_scene_text" in st.session_state:
+        if st.session_state.get("scene_text", "") != st.session_state.prev_scene_text:
+            return True
     
     return False
 
@@ -445,6 +450,13 @@ def render() -> None:
                 st.session_state.facts_generated = True
                 st.session_state.prev_scenario_text = st.session_state.scenario_text
                 st.session_state.prev_scene_text = st.session_state.scene_text
+                # Clear dirty flags since facts are now generated based on current state
+                st.session_state.setting_dirty = False
+                st.session_state.location_dirty = False
+                # Clear character dirty flags (but preserve portrait dirty flags if needed)
+                characters = st.session_state.get("characters", [])
+                for char in characters:
+                    char["_dirty"] = False
                 st.success("✓ Facts generated successfully!")
             else:
                 st.error(f"✗ Failed to generate facts: {result.get('result_details', 'Unknown error')}")
@@ -545,9 +557,8 @@ def render() -> None:
                 )
                 
                 # Track scenario text changes
-                if scenario_text != st.session_state.get("prev_scenario_text", ""):
+                if scenario_text != st.session_state.scenario_text:
                     st.session_state.scenario_text = scenario_text
-                    st.session_state.prev_scenario_text = scenario_text
                     # Clear facts if scenario changed
                     if st.session_state.facts_generated:
                         st.session_state.facts_json = ""
@@ -588,9 +599,8 @@ def render() -> None:
                 )
                 
                 # Track scene text changes
-                if scene_text != st.session_state.get("prev_scene_text", ""):
+                if scene_text != st.session_state.scene_text:
                     st.session_state.scene_text = scene_text
-                    st.session_state.prev_scene_text = scene_text
                     # Clear facts if scene changed
                     if st.session_state.facts_generated:
                         st.session_state.facts_json = ""
