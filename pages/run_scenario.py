@@ -662,27 +662,6 @@ def render() -> None:
                 or st.session_state.processing_turn
             )
             
-            if st.session_state.facts_generated and st.session_state.facts_json:
-                # Display JSON using st.json() for proper formatting (read-only)
-                # This matches the display format used in other areas (characters, adjudication, etc.)
-                try:
-                    # Parse the JSON string to get the full nested structure
-                    facts_dict = json.loads(st.session_state.facts_json)
-                    # Recursively parse any nested JSON strings within the structure
-                    facts_dict_parsed = _parse_nested_json(facts_dict)
-                    # Display with st.json() which handles nested structures properly
-                    st.json(facts_dict_parsed)
-                except (json.JSONDecodeError, TypeError) as e:
-                    st.error(f"Invalid JSON format: {e}")
-                    # Fallback to text display if JSON parsing fails
-                    st.text_area(
-                        "Facts JSON (Raw)",
-                        value=st.session_state.facts_json,
-                        height=200,
-                        disabled=True,
-                        label_visibility="collapsed",
-                    )
-            
             # If we just generated facts, ensure the editor has the content
             if st.session_state.facts_generated and not st.session_state.facts_json_editor:
                 st.session_state.facts_json_editor = st.session_state.facts_json
