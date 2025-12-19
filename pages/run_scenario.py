@@ -122,6 +122,72 @@ def _validate_json(json_str: str) -> tuple[bool, str | None]:
         return False, str(e)
 
 
+def _parse_nested_json(obj: Any, max_depth: int = 20) -> Any:
+    """Recursively parse JSON strings within a dict/list structure.
+    
+    This function will recursively find and parse any JSON strings at any nesting level,
+    ensuring that nested JSON structures are fully expanded for display.
+    
+    Args:
+        obj: The object to parse (can be dict, list, str, or other)
+        max_depth: Maximum recursion depth to prevent infinite loops
+    """
+    if max_depth <= 0:
+        logger.warning("Max depth reached in _parse_nested_json")
+        return obj
+    
+    if isinstance(obj, str):
+        # Try to parse if it looks like JSON
+        stripped = obj.strip()
+        if not stripped:
+            return obj
+        
+        # Check if it looks like JSON (starts with { or [)
+        if (stripped.startswith('{') and stripped.endswith('}')) or \
+           (stripped.startswith('[') and stripped.endswith(']')):
+            try:
+                parsed = json.loads(obj)
+                # Recursively parse the parsed value to handle nested JSON strings
+                return _parse_nested_json(parsed, max_depth - 1)
+            except (json.JSONDecodeError, ValueError, TypeError) as e:
+                # If parsing fails (e.g., malformed JSON), try to parse just the first object
+                # This handles cases where multiple JSON objects are concatenated
+                if stripped.startswith('{'):
+                    try:
+                        # Try to find the first complete JSON object
+                        brace_count = 0
+                        end_pos = -1
+                        for i, char in enumerate(stripped):
+                            if char == '{':
+                                brace_count += 1
+                            elif char == '}':
+                                brace_count -= 1
+                                if brace_count == 0:
+                                    end_pos = i + 1
+                                    break
+                        if end_pos > 0:
+                            first_json = stripped[:end_pos]
+                            parsed = json.loads(first_json)
+                            return _parse_nested_json(parsed, max_depth - 1)
+                    except (json.JSONDecodeError, ValueError, TypeError):
+                        pass
+                # If all parsing attempts fail, return original string
+                logger.debug(f"Could not parse JSON string: {e}")
+                return obj
+        return obj
+    elif isinstance(obj, dict):
+        # Recursively parse all values in the dict
+        result = {}
+        for key, value in obj.items():
+            result[key] = _parse_nested_json(value, max_depth - 1)
+        return result
+    elif isinstance(obj, list):
+        # Recursively parse all items in the list
+        return [_parse_nested_json(item, max_depth - 1) for item in obj]
+    else:
+        return obj
+
+
 async def _generate_facts_async() -> dict:
     """Generate facts using the fact_generation workflow."""
     context = st.session_state.get("context_text_area", "")
@@ -359,7 +425,21 @@ def render() -> None:
             result = asyncio.run(_generate_facts_async())
             if result.get("was_successful"):
                 facts = result.get("facts", {})
-                facts_str = json.dumps(facts, indent=2)
+                # Handle if facts is already a string or a dict
+                if isinstance(facts, str):
+                    # If it's a string, parse it to ensure it's valid JSON
+                    try:
+                        facts = json.loads(facts)
+                    except json.JSONDecodeError:
+                        pass  # Keep as string if not valid JSON
+                
+                # Recursively parse all nested JSON strings in the facts structure
+                # This ensures that values like "location", "scenario", "scene" that are JSON strings
+                # get parsed into proper nested structures
+                facts_parsed = _parse_nested_json(facts)
+                
+                # Store as both dict (for display) and string (for editor)
+                facts_str = json.dumps(facts_parsed, indent=2) if not isinstance(facts_parsed, str) else facts_parsed
                 st.session_state.facts_json = facts_str
                 st.session_state.facts_json_editor = facts_str  # Update the widget state directly
                 st.session_state.facts_generated = True
@@ -581,6 +661,27 @@ def render() -> None:
                 or st.session_state.generating_facts
                 or st.session_state.processing_turn
             )
+            
+            if st.session_state.facts_generated and st.session_state.facts_json:
+                # Display JSON using st.json() for proper formatting (read-only)
+                # This matches the display format used in other areas (characters, adjudication, etc.)
+                try:
+                    # Parse the JSON string to get the full nested structure
+                    facts_dict = json.loads(st.session_state.facts_json)
+                    # Recursively parse any nested JSON strings within the structure
+                    facts_dict_parsed = _parse_nested_json(facts_dict)
+                    # Display with st.json() which handles nested structures properly
+                    st.json(facts_dict_parsed)
+                except (json.JSONDecodeError, TypeError) as e:
+                    st.error(f"Invalid JSON format: {e}")
+                    # Fallback to text display if JSON parsing fails
+                    st.text_area(
+                        "Facts JSON (Raw)",
+                        value=st.session_state.facts_json,
+                        height=200,
+                        disabled=True,
+                        label_visibility="collapsed",
+                    )
             
             # If we just generated facts, ensure the editor has the content
             if st.session_state.facts_generated and not st.session_state.facts_json_editor:
