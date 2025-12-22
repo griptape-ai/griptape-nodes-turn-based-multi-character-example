@@ -55,6 +55,8 @@ def _initialize_run_scenario_state() -> None:
         st.session_state.scene_text = SCENE_PREFABS["Throne Room Confrontation"]
     if "facts_json" not in st.session_state:
         st.session_state.facts_json = ""
+    if "facts_json_editor" not in st.session_state:
+        st.session_state.facts_json_editor = ""
     if "facts_generated" not in st.session_state:
         st.session_state.facts_generated = False
     if "generating_facts" not in st.session_state:
@@ -80,10 +82,17 @@ def _initialize_run_scenario_state() -> None:
         st.session_state.expander_characters = True
     if "expander_facts_editor" not in st.session_state:
         st.session_state.expander_facts_editor = True
+    # Initialize prev values only if facts have been generated
+    # Don't initialize them here - let _check_dirty_state handle it
+    # or set them when facts are generated
 
 
 def _check_dirty_state() -> bool:
     """Check if any upstream data is dirty (requires Generate Facts to be re-run)."""
+    # If facts haven't been generated yet, nothing is dirty
+    if not st.session_state.get("facts_generated", False):
+        return False
+    
     # Check if setting is dirty
     if st.session_state.get("setting_dirty", False):
         return True
@@ -96,15 +105,13 @@ def _check_dirty_state() -> bool:
         if char.get("_dirty", False):
             return True
     # Check if scenario or scene changed
-    if "prev_scenario_text" not in st.session_state:
-        st.session_state.prev_scenario_text = st.session_state.get("scenario_text", "")
-    if "prev_scene_text" not in st.session_state:
-        st.session_state.prev_scene_text = st.session_state.get("scene_text", "")
-    
-    if st.session_state.get("scenario_text", "") != st.session_state.prev_scenario_text:
-        return True
-    if st.session_state.get("scene_text", "") != st.session_state.prev_scene_text:
-        return True
+    # Only check if prev values exist (they should exist if facts were generated)
+    if "prev_scenario_text" in st.session_state:
+        if st.session_state.get("scenario_text", "") != st.session_state.prev_scenario_text:
+            return True
+    if "prev_scene_text" in st.session_state:
+        if st.session_state.get("scene_text", "") != st.session_state.prev_scene_text:
+            return True
     
     return False
 
@@ -118,6 +125,72 @@ def _validate_json(json_str: str) -> tuple[bool, str | None]:
         return True, None
     except json.JSONDecodeError as e:
         return False, str(e)
+
+
+def _parse_nested_json(obj: Any, max_depth: int = 20) -> Any:
+    """Recursively parse JSON strings within a dict/list structure.
+    
+    This function will recursively find and parse any JSON strings at any nesting level,
+    ensuring that nested JSON structures are fully expanded for display.
+    
+    Args:
+        obj: The object to parse (can be dict, list, str, or other)
+        max_depth: Maximum recursion depth to prevent infinite loops
+    """
+    if max_depth <= 0:
+        logger.warning("Max depth reached in _parse_nested_json")
+        return obj
+    
+    if isinstance(obj, str):
+        # Try to parse if it looks like JSON
+        stripped = obj.strip()
+        if not stripped:
+            return obj
+        
+        # Check if it looks like JSON (starts with { or [)
+        if (stripped.startswith('{') and stripped.endswith('}')) or \
+           (stripped.startswith('[') and stripped.endswith(']')):
+            try:
+                parsed = json.loads(obj)
+                # Recursively parse the parsed value to handle nested JSON strings
+                return _parse_nested_json(parsed, max_depth - 1)
+            except (json.JSONDecodeError, ValueError, TypeError) as e:
+                # If parsing fails (e.g., malformed JSON), try to parse just the first object
+                # This handles cases where multiple JSON objects are concatenated
+                if stripped.startswith('{'):
+                    try:
+                        # Try to find the first complete JSON object
+                        brace_count = 0
+                        end_pos = -1
+                        for i, char in enumerate(stripped):
+                            if char == '{':
+                                brace_count += 1
+                            elif char == '}':
+                                brace_count -= 1
+                                if brace_count == 0:
+                                    end_pos = i + 1
+                                    break
+                        if end_pos > 0:
+                            first_json = stripped[:end_pos]
+                            parsed = json.loads(first_json)
+                            return _parse_nested_json(parsed, max_depth - 1)
+                    except (json.JSONDecodeError, ValueError, TypeError):
+                        pass
+                # If all parsing attempts fail, return original string
+                logger.debug(f"Could not parse JSON string: {e}")
+                return obj
+        return obj
+    elif isinstance(obj, dict):
+        # Recursively parse all values in the dict
+        result = {}
+        for key, value in obj.items():
+            result[key] = _parse_nested_json(value, max_depth - 1)
+        return result
+    elif isinstance(obj, list):
+        # Recursively parse all items in the list
+        return [_parse_nested_json(item, max_depth - 1) for item in obj]
+    else:
+        return obj
 
 
 async def _generate_facts_async() -> dict:
@@ -171,11 +244,12 @@ async def _generate_facts_async() -> dict:
             }
 
         # Extract facts from workflow output
-        # The workflow returns was_successful, result_details, and facts
+        # The workflow returns was_successful, result_details, and facts inside "End Flow"
+        end_flow = output.get("End Flow", {})
         return {
-            "was_successful": output.get("was_successful", True),
-            "result_details": output.get("result_details", "Facts generated successfully"),
-            "facts": output.get("facts"),
+            "was_successful": end_flow.get("was_successful", True),
+            "result_details": end_flow.get("result_details", "Facts generated successfully"),
+            "facts": end_flow.get("facts"),
         }
     except Exception as e:
         logger.exception("Failed to generate facts")
@@ -341,12 +415,72 @@ def _render_turn_log(turn: dict) -> None:
 def render() -> None:
     """Render the Run Scenario page."""
     _initialize_run_scenario_state()
+    
+    # Handle Generate Facts workflow
+    if st.session_state.generating_facts:
+        try:
+            result = asyncio.run(_generate_facts_async())
+            if result.get("was_successful"):
+                facts = result.get("facts", {})
+                # Handle if facts is already a string or a dict
+                if isinstance(facts, str):
+                    # If it's a string, parse it to ensure it's valid JSON
+                    try:
+                        facts = json.loads(facts)
+                    except json.JSONDecodeError:
+                        pass  # Keep as string if not valid JSON
+                
+                # Recursively parse all nested JSON strings in the facts structure
+                # This ensures that values like "location", "scenario", "scene" that are JSON strings
+                # get parsed into proper nested structures
+                facts_parsed = _parse_nested_json(facts)
+                
+                # Store as both dict (for display) and string (for editor)
+                facts_str = json.dumps(facts_parsed, indent=2) if not isinstance(facts_parsed, str) else facts_parsed
+                st.session_state.facts_json = facts_str
+                st.session_state.facts_json_editor = facts_str  # Update the widget state directly
+                st.session_state.facts_generated = True
+                st.session_state.prev_scenario_text = st.session_state.scenario_text
+                st.session_state.prev_scene_text = st.session_state.scene_text
+                # Clear dirty flags since facts are now generated based on current state
+                st.session_state.setting_dirty = False
+                st.session_state.location_dirty = False
+                # Clear character dirty flags (but preserve portrait dirty flags if needed)
+                characters = st.session_state.get("characters", [])
+                for char in characters:
+                    char["_dirty"] = False
+                st.success("✓ Facts generated successfully!")
+            else:
+                st.error(f"✗ Failed to generate facts: {result.get('result_details', 'Unknown error')}")
+        except Exception as e:
+            st.error(f"✗ Facts generation failed: {e}")
+        finally:
+            st.session_state.generating_facts = False
+            st.rerun()
+    
+    # Handle turn processing
+    if st.session_state.processing_turn and st.session_state.scenario_running:
+        try:
+            turn_num = st.session_state.current_turn + 1
+            result = asyncio.run(_execute_turn_async(turn_num))
+            logger.info(f"Turn {turn_num} response: {json.dumps(result, indent=2)}")
+            if result.get("was_successful"):
+                turn_data = result.get("turn_data", {})
+                st.session_state.scenario_turns.append(turn_data)
+                st.session_state.current_turn = turn_num
+            else:
+                st.error(f"✗ Turn {turn_num} failed: {result.get('result_details', 'Unknown error')}")
+        except Exception as e:
+            logger.exception(f"Turn execution failed: {e}")
+            st.error(f"✗ Turn execution failed: {e}")
+        finally:
+            st.session_state.processing_turn = False
+            st.rerun()
 
-    # Show indicator if location changed and needs updating
-    location_dirty = st.session_state.get("location_dirty", False)
-    header_text = "Run Scenario*" if location_dirty else "Run Scenario"
-
+    is_dirty = _check_dirty_state()
+    header_text = "Run Scenario*" if is_dirty else "Run Scenario"
     st.header(header_text)
+    
     st.markdown("Configure and execute turn-based multi-character role-playing scenarios.")
     
     # Three-panel layout
@@ -401,6 +535,7 @@ def render() -> None:
                     # Clear facts if scenario changed
                     if st.session_state.facts_generated:
                         st.session_state.facts_json = ""
+                        st.session_state.facts_json_editor = ""
                         st.session_state.facts_generated = False
                     st.rerun()
                 
@@ -414,12 +549,12 @@ def render() -> None:
                 )
                 
                 # Track scenario text changes
-                if scenario_text != st.session_state.get("prev_scenario_text", ""):
+                if scenario_text != st.session_state.scenario_text:
                     st.session_state.scenario_text = scenario_text
-                    st.session_state.prev_scenario_text = scenario_text
                     # Clear facts if scenario changed
                     if st.session_state.facts_generated:
                         st.session_state.facts_json = ""
+                        st.session_state.facts_json_editor = ""
                         st.session_state.facts_generated = False
             
             # Scene Configuration - Collapsible
@@ -456,9 +591,8 @@ def render() -> None:
                 )
                 
                 # Track scene text changes
-                if scene_text != st.session_state.get("prev_scene_text", ""):
+                if scene_text != st.session_state.scene_text:
                     st.session_state.scene_text = scene_text
-                    st.session_state.prev_scene_text = scene_text
                     # Clear facts if scene changed
                     if st.session_state.facts_generated:
                         st.session_state.facts_json = ""
@@ -524,26 +658,27 @@ def render() -> None:
         
         # Bottom-left panel: Facts JSON Editor - Collapsible
         with st.expander("**Facts JSON Editor**", expanded=st.session_state.expander_facts_editor):
-            facts_placeholder = "Click Generate Facts to populate"
-            facts_value = st.session_state.facts_json if st.session_state.facts_json else facts_placeholder
-            
             facts_disabled = (
                 not st.session_state.facts_generated
                 or st.session_state.generating_facts
                 or st.session_state.processing_turn
             )
             
+            # If we just generated facts, ensure the editor has the content
+            if st.session_state.facts_generated and not st.session_state.facts_json_editor:
+                st.session_state.facts_json_editor = st.session_state.facts_json
+
             facts_text = st.text_area(
                 "Facts JSON",
-                value=facts_value if st.session_state.facts_generated else facts_placeholder,
                 height=400,
                 key="facts_json_editor",
                 label_visibility="collapsed",
                 disabled=facts_disabled,
+                placeholder="Click Generate Facts to populate",
             )
             
-            # Validate and update facts JSON
-            if st.session_state.facts_generated and facts_text != facts_placeholder:
+            # Validate and update facts JSON from editor changes
+            if st.session_state.facts_generated and facts_text:
                 is_valid, error_msg = _validate_json(facts_text)
                 if not is_valid:
                     st.error(f"Invalid JSON: {error_msg}")
@@ -565,43 +700,4 @@ def render() -> None:
             if st.session_state.processing_turn:
                 with st.spinner(f"Processing Turn {st.session_state.current_turn + 1}..."):
                     pass
-    
-    # Handle Generate Facts workflow
-    if st.session_state.generating_facts:
-        try:
-            result = asyncio.run(_generate_facts_async())
-            if result.get("was_successful"):
-                facts = result.get("facts", {})
-                st.session_state.facts_json = json.dumps(facts, indent=2)
-                st.session_state.facts_generated = True
-                st.session_state.prev_scenario_text = st.session_state.scenario_text
-                st.session_state.prev_scene_text = st.session_state.scene_text
-                st.success("✓ Facts generated successfully!")
-            else:
-                st.error(f"✗ Failed to generate facts: {result.get('result_details', 'Unknown error')}")
-        except Exception as e:
-            st.error(f"✗ Facts generation failed: {e}")
-        finally:
-            st.session_state.generating_facts = False
-            st.rerun()
-    
-    # Handle turn processing
-    if st.session_state.processing_turn and st.session_state.scenario_running:
-        try:
-            turn_num = st.session_state.current_turn + 1
-            result = asyncio.run(_execute_turn_async(turn_num))
-            logger.info(f"Turn {turn_num} response: {json.dumps(result, indent=2)}")
-            if result.get("was_successful"):
-                turn_data = result.get("turn_data", {})
-                st.session_state.scenario_turns.append(turn_data)
-                st.session_state.current_turn = turn_num
-                # Update facts JSON with changes from turn
-                # TODO: Apply fact changes from adjudication
-            else:
-                st.error(f"✗ Turn {turn_num} failed: {result.get('result_details', 'Unknown error')}")
-        except Exception as e:
-            logger.exception(f"Turn execution failed: {e}")
-            st.error(f"✗ Turn execution failed: {e}")
-        finally:
-            st.session_state.processing_turn = False
-            st.rerun()
+
